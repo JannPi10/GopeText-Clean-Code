@@ -2,15 +2,15 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    //esto es firebase
+    // esto es firebase (si vas a usarlo, asegúrate de agregar el plugin real)
 }
 
 android {
-    namespace = "com.example.gopetext"
+    namespace = "com.danieldaz.registro_gopetext"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.gopetext"
+        applicationId = "com.danieldaz.registro_gopetext"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -28,20 +28,26 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
+    // ConstraintLayout en Compose
+    implementation(libs.androidx.constraintlayout)
 
+    // Dependencias estándar de Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -51,6 +57,8 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
+
+    // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -58,6 +66,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(libs.androidx.constraintlayout)
-    //esto es firebase
+
+    // esto es firebase (si tienes librerías específicas, agrégalas aquí)
 }
