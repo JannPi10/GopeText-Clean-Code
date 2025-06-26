@@ -19,10 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-<<<<<<< HEAD
-rootProject.name = "GopeText"
-=======
-rootProject.name = "Registro_Gopetext"
->>>>>>> 785b63d (Task: Register!)
+
 include(":app")
  

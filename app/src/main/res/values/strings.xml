@@ -1,7 +1,6 @@
 <resources>
-<<<<<<< HEAD
+
     <string name="app_name">GopeText</string>
-=======
-    <string name="app_name">Registro_Gopetext</string>
->>>>>>> 785b63d (Task: Register!)
+
+
 </resources>

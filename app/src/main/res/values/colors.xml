@@ -6,10 +6,8 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
-<<<<<<< HEAD
+
     <color name="white">#FFFFFF</color>
     <color name="indigo">#5856D6</color>
-=======
-    <color name="white">#FFFFFFFF</color>
->>>>>>> 785b63d (Task: Register!)
+
 </resources>
