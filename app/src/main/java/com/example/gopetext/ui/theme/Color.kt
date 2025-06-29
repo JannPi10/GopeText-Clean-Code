@@ -1,4 +1,4 @@
-package com.danieldaz.registro_gopetext.ui.theme
+package com.example.gopetext.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
