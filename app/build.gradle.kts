@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.danieldaz.registro_gopetext"
+    namespace = "com.example.gopetext"
     compileSdk = 35
 
     defaultConfig {
@@ -40,6 +40,7 @@ android {
 
     buildFeatures {
         compose = true
+        viewBinding = true
     }
 }
 
@@ -57,6 +58,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.leanback)
 
     // Test
     testImplementation(libs.junit)
@@ -67,5 +69,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // esto es firebase (si tienes librerías específicas, agrégalas aquí)
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
 }

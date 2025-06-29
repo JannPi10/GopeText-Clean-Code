@@ -3,7 +3,6 @@
 
 
     <style name="Theme.GopeText" parent="Theme.AppCompat.Light.NoActionBar" />
-
-    <style name="Theme.Registro_Gopetext" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.Registro_Gopetext" parent="Theme.AppCompat.Light.NoActionBar" />
 
 </resources>
