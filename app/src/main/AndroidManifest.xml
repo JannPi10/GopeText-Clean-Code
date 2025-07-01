@@ -32,6 +32,13 @@
             android:label="@string/app_name"
             android:theme="@style/Theme.Registro_Gopetext" />
 
+        <activity
+            android:name=".auth.home.HomeActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.GopeText" />
+
+
     </application>
 </manifest>
 

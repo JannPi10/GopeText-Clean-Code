@@ -8,11 +8,11 @@ import retrofit2.converter.gson.GsonConverterFactory
 object ApiClient {
 
     private val client = OkHttpClient.Builder()
-        .addInterceptor(AuthInterceptor())  // ← solo si lo necesitas
+        .addInterceptor(AuthInterceptor())
         .build()
 
     val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(Constants.BASE_URL)  // ← este debe terminar en "/"
+        .baseUrl(Constants.BASE_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .client(client)
         .build()

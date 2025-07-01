@@ -3,6 +3,7 @@ package com.example.gopetext.auth.login
 import android.util.Log
 import com.example.gopetext.data.api.AuthService
 import com.example.gopetext.data.api.LoginRequest
+import com.example.gopetext.data.storage.SessionManager
 import com.example.gopetext.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,29 +14,42 @@ import java.io.IOException
 
 class LoginPresenter(
     private val view: LoginContract.View,
-    private val api: AuthService
+    private val api: AuthService,
+    private val sessionManager: SessionManager
+
 ) : LoginContract.Presenter {
 
     override fun login(email: String, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
+            Log.d("LoginPresenter", "Intentando login con email: $email")
+            Log.d("LoginPresenter", "Intentando login con password: $password")
+
             try {
-                val loginResponse = api.login(LoginRequest(email, password))
-                Log.d("LoginPresenter", "Login exitoso: $loginResponse")
+                val response = api.login(LoginRequest(email, password))
+                if (response.isSuccessful && response.body() != null) {
+                    val body = response.body()!!
+                    Log.d("LoginPresenter", "Login exitoso: token=${body.access_token}")
 
-                withContext(Dispatchers.Main) {
-                    view.showLoginSuccess()
-                }
+                    sessionManager.saveAccessToken(body.access_token)
 
-            } catch (e: HttpException) {
-                val errorMessage = when (e.code()) {
-                    401 -> "Credenciales inválidas"
-                    404 -> "Usuario no encontrado"
-                    else -> "Error desconocido (${e.code()})"
-                }
-                Log.e("LoginPresenter", "Error HTTP: ${e.message()}", e)
+                    withContext(Dispatchers.Main) {
+                        view.showLoginSuccess()
+                    }
 
-                withContext(Dispatchers.Main) {
-                    view.showLoginError(errorMessage)
+                } else {
+                    val errorMessage = when (response.code()) {
+                        401 -> "Credenciales inválidas"
+                        404 -> "Usuario no encontrado"
+                        else -> "Error desconocido (${response.code()})"
+                    }
+
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("LoginPresenter", "Error HTTP ${response.code()}: $errorBody")
+
+
+                    withContext(Dispatchers.Main) {
+                        view.showLoginError(errorMessage)
+                    }
                 }
 
             } catch (e: IOException) {
