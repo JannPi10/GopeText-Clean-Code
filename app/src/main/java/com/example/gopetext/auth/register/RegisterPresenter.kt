@@ -23,7 +23,14 @@ class RegisterPresenter(private val view: RegisterContract.View) : RegisterContr
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val request = RegisterRequest(name, last_name, age, email, password, confirm_password)
+                val request = RegisterRequest(
+                    name = name,
+                    last_name = last_name,
+                    age = age,
+                    email = email,
+                    password = password,
+                    confirm_password = confirm_password
+                )
                 Log.d("RegisterPresenter", "Enviando solicitud al servidor: $request")
 
                 // 🔍 Log adicional para confirmar la URL final usada por Retrofit

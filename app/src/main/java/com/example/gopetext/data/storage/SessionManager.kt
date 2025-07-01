@@ -2,8 +2,9 @@ package com.example.gopetext.data.storage
 
 import android.content.Context
 import android.content.SharedPreferences
+import kotlin.coroutines.CoroutineContext
 
-class SessionManager(context: Context) {
+class SessionManager(context: Context) { // ✅ Context de Android
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -22,5 +23,9 @@ class SessionManager(context: Context) {
 
     fun clearSession() {
         prefs.edit().clear().apply()
+    }
+
+    fun isLoggedIn(): Boolean {
+        return getAccessToken() != null
     }
 }
