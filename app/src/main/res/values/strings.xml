@@ -2,5 +2,7 @@
 
     <string name="app_name">GopeText</string>
 
+    <string name="menu_salir">Cerrar Sesión</string>
+
 
 </resources>

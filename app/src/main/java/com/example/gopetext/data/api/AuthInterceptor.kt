@@ -1,16 +1,31 @@
 package com.example.gopetext.data.api
 
+import com.example.gopetext.data.storage.SessionManager
 import com.example.gopetext.utils.Constants
 import okhttp3.Interceptor
 import okhttp3.Response
 
-class AuthInterceptor : Interceptor {
+
+class AuthInterceptor(private val sessionManager: SessionManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val request = chain.request().newBuilder()
-            .addHeader("x-api-key", Constants.API_KEY)
+        val token = sessionManager.getAccessToken()
+
+        val requestBuilder = chain.request().newBuilder()
             .addHeader("Content-Type", "application/json")
-            .addHeader("x-mock-match-request-body", "false")
-            .build()
-        return chain.proceed(request)
+
+        token?.let {
+            requestBuilder.addHeader("Authorization", "Bearer $it")
+        }
+
+        return chain.proceed(requestBuilder.build())
     }
 }
+
+
+
+
+/** Para actualizar el proyecto
+ * git fetch origin
+ * git checkout dev
+ * git pull origin dev
+ */

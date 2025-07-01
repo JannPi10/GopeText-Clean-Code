@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.gopetext.R
 import com.example.gopetext.auth.home.HomeActivity
 import com.example.gopetext.auth.register.RegisterActivity
-import com.example.gopetext.data.api.RetrofitClient
+import com.example.gopetext.data.api.ApiClient
+import com.example.gopetext.data.api.AuthService
 import com.example.gopetext.data.storage.SessionManager
-
 
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
@@ -23,6 +23,7 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        ApiClient.init(applicationContext)
 
         // Inicializa campos
         edtEmail = findViewById(R.id.etEmail)
@@ -32,7 +33,14 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
         // Inicializa SessionManager y Presenter
         sessionManager = SessionManager(applicationContext)
-        presenter = LoginPresenter(this, RetrofitClient.authService, sessionManager)
+        presenter = LoginPresenter(
+            this,
+            ApiClient.retrofit.create(AuthService::class.java),
+            sessionManager
+        )
+
+        // ✅ Verificar sesión luego de inicializar el presentador
+        presenter.checkSession()
 
         btnIniciarSesion.setOnClickListener {
             val email = edtEmail.text.toString()
@@ -54,5 +62,10 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun showLoginError(message: String) {
         Toast.makeText(this, "Error: $message", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun navigateToHome() {
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
     }
 }
