@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    // esto es firebase (si vas a usarlo, asegúrate de agregar el plugin real)
+    id("kotlin-kapt")
 }
 
 android {
@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.leanback)
+    implementation(libs.material)
 
     // Test
     testImplementation(libs.junit)
@@ -73,4 +74,9 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
+
+    //Glide
+    implementation(libs.glide)
+    kapt(libs.compiler)
+
 }

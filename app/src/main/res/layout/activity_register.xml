@@ -13,18 +13,21 @@
                 <TextView
                     android:id="@+id/tvAppTitle"
                     android:layout_width="0dp"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
+                    android:width="0dp"
+                    android:height="70dp"
+                    android:padding="15dp"
                     android:background="#8000D9"
                     android:letterSpacing="0.05"
                     android:text="GOPETEXT"
                     android:textAlignment="center"
                     android:textAllCaps="true"
-                    android:textColor="@color/white"
                     android:textSize="20sp"
                     android:textStyle="bold"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:textColor="@color/white"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <TextView
                     android:id="@+id/tvLogin"
@@ -141,7 +144,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="32dp"
-                    android:backgroundTint="@color/purple_500"
+                    android:backgroundTint="#8000D9"
                     android:text="Registrarse"
                     android:textColor="@color/white"
                     app:layout_constraintTop_toBottomOf="@id/etConfirmPassword"
