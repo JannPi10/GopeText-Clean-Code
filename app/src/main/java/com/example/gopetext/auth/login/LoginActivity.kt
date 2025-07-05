@@ -25,27 +25,33 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         setContentView(R.layout.activity_login)
         ApiClient.init(applicationContext)
 
-        // Inicializa campos
+        //Inicializa campos
         edtEmail = findViewById(R.id.etEmail)
         edtPassword = findViewById(R.id.etPassword)
         val btnIniciarSesion = findViewById<Button>(R.id.btnEntrar)
         val btnRegistrarse = findViewById<Button>(R.id.btnRegistrarse)
 
-        // Inicializa SessionManager y Presenter
+        //Inicializa SessionManager y Presenter
         sessionManager = SessionManager(applicationContext)
         presenter = LoginPresenter(
             this,
-            ApiClient.retrofit.create(AuthService::class.java),
+            ApiClient.getService(),
             sessionManager
         )
 
-        // ✅ Verificar sesión luego de inicializar el presentador
+        //Verificar sesión luego de inicializar el presentador
         presenter.checkSession()
 
         btnIniciarSesion.setOnClickListener {
+            // Validaciones
             val email = edtEmail.text.toString()
             val password = edtPassword.text.toString()
-            presenter.login(email, password)
+            if ( email.isEmpty() || password.isEmpty()) {
+                showLoginError("Por favor complete todos los campos.")
+            }
+            else {
+                presenter.login(email, password)
+            }
         }
 
         btnRegistrarse.setOnClickListener {

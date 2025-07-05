@@ -36,10 +36,10 @@ class LoginPresenter(
                     withContext(Dispatchers.Main) {
                         view.showLoginSuccess()
                     }
-
-                } else {
+                }
+                else {
                     val errorMessage = when (response.code()) {
-                        401 -> "Credenciales inválidas"
+                        401 -> "Usuario o contraseña incorrectos"
                         404 -> "Usuario no encontrado"
                         else -> "Error desconocido (${response.code()})"
                     }

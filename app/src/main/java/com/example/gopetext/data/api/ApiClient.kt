@@ -9,13 +9,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
 
-    lateinit var retrofit: Retrofit
+    private lateinit var retrofit: Retrofit
 
     fun init(context: Context) {
         val sessionManager = SessionManager(context)
 
         val client = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(sessionManager)) // ✅ ahora sí
+            .addInterceptor(AuthInterceptor(sessionManager))
             .build()
 
         retrofit = Retrofit.Builder()
@@ -24,7 +24,15 @@ object ApiClient {
             .client(client)
             .build()
     }
+
+    fun getService(): AuthService {
+        if (!::retrofit.isInitialized) {
+            throw IllegalStateException("ApiClient no ha sido inicializado.")
+        }
+        return retrofit.create(AuthService::class.java)
+    }
 }
+
 
 
 

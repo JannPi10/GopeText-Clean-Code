@@ -8,7 +8,7 @@ import android.util.Log
 
 class RegisterPresenter(private val view: RegisterContract.View) : RegisterContract.Presenter {
 
-    private val service = ApiClient.retrofit.create(AuthService::class.java)
+    private val service = ApiClient.getService()
 
     override fun register(
         name: String,
@@ -32,9 +32,6 @@ class RegisterPresenter(private val view: RegisterContract.View) : RegisterContr
                     confirm_password = confirm_password
                 )
                 Log.d("RegisterPresenter", "Enviando solicitud al servidor: $request")
-
-                // 🔍 Log adicional para confirmar la URL final usada por Retrofit
-                Log.d("Retrofit", "URL final: ${ApiClient.retrofit.baseUrl()}register")
 
                 val response = service.register(request)
 
