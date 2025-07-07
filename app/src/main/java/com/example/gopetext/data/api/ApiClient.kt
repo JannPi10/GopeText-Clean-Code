@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object ApiClient {
 
-    private lateinit var retrofit: Retrofit
+    lateinit var retrofit: Retrofit
 
     fun init(context: Context) {
         val sessionManager = SessionManager(context)

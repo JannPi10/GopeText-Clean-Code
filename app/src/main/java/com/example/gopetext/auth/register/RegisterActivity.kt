@@ -24,7 +24,8 @@ class RegisterActivity : AppCompatActivity(), RegisterContract.View {
         val etEmail = findViewById<EditText>(R.id.etEmailAddress)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val etConfirmPassword = findViewById<EditText>(R.id.etConfirmPassword)
-        val btnRegister = findViewById<Button>(R.id.btnRegistro)
+        val btnRegister = findViewById<Button>(R.id.btnRegister)
+        val btnBacktoLogin = findViewById<Button>(R.id.btnBackToLogin)
 
         presenter = RegisterPresenter(this)
 
@@ -58,6 +59,11 @@ class RegisterActivity : AppCompatActivity(), RegisterContract.View {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
         }
+
+        btnBacktoLogin.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+
     }
 
     override fun showMessage(message: String) {

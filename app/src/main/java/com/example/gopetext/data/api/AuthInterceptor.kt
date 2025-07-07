@@ -23,8 +23,3 @@ class AuthInterceptor(private val sessionManager: SessionManager) : Interceptor 
 }
 
 
-/** Para actualizar el proyecto
- * git fetch origin
- * git checkout dev
- * git pull origin dev
- */

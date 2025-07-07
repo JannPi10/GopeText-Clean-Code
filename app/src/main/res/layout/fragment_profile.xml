@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <!-- Campos de nombre, apellido y correo -->
         <ImageView
             android:id="@+id/imgProfile"
             android:layout_width="120dp"
@@ -69,9 +68,11 @@
             android:layout_height="wrap_content"
             android:backgroundTint="#8000D9"
             android:text="EDITAR"
+            android:textStyle="bold"
             android:textColor="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imgProfile"
             app:layout_constraintVertical_bias="0.753"
             tools:layout_editor_absoluteX="0dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

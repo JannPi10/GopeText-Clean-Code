@@ -3,10 +3,12 @@ package com.example.gopetext.auth.home
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.gopetext.R
+import com.example.gopetext.auth.chat.ChatActivity
 import com.example.gopetext.auth.home.fragments.chats.ChatsFragment
 import com.example.gopetext.auth.home.fragments.groups.CreateGroupFragment
 import com.example.gopetext.auth.home.fragments.profile.ProfileFragment
@@ -25,6 +27,9 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         ApiClient.init(applicationContext)
+
+
+
 
         sessionManager = SessionManager(this)
 

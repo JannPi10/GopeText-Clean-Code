@@ -79,4 +79,8 @@ dependencies {
     implementation(libs.glide)
     kapt(libs.compiler)
 
+    //RoundedImageView
+    implementation(libs.roundedimageview)
+
+
 }

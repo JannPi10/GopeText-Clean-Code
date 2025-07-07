@@ -9,5 +9,8 @@
 
     <color name="white">#FFFFFF</color>
     <color name="indigo">#5856D6</color>
+    <color name="Gopecolor">#8000D9</color>
+    <color name="primary_dark">#1a1c1b</color>
+    <color name="input_color">#9c9a9a</color>
 
 </resources>

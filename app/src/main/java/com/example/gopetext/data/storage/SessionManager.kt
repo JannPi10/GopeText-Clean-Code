@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import kotlin.coroutines.CoroutineContext
 
-class SessionManager(context: Context) { // ✅ Context de Android
+class SessionManager(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -25,7 +25,4 @@ class SessionManager(context: Context) { // ✅ Context de Android
         prefs.edit().clear().apply()
     }
 
-    fun isLoggedIn(): Boolean {
-        return getAccessToken() != null
-    }
 }
