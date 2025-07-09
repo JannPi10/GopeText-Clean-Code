@@ -1,5 +1,6 @@
 package com.example.gopetext.auth.home.fragments.chats
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gopetext.R
 import com.example.gopetext.data.model.Contact
+import com.example.gopetext.utils.Constants
 
 class ChatsAdapter(
     private val onItemClick: (Contact) -> Unit
@@ -28,13 +30,29 @@ class ChatsAdapter(
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val contact = getItem(position)
+        Log.d("ChatsAdapter", "Mostrando chat: ${contact.name}")
+
         holder.name.text = contact.name
-        Glide.with(holder.itemView.context).load(contact.profileImageUrl).into(holder.image)
-        holder.itemView.setOnClickListener { onItemClick(contact) }
+
+        val imageUrl = contact.profile_image_url?.let {
+            if (it.startsWith("http")) it else Constants.BASE_URL + it.removePrefix("/")
+        }
+
+        Glide.with(holder.itemView.context)
+            .load(imageUrl)
+            .placeholder(R.drawable.ic_baseline_person_24)
+            .circleCrop()
+            .into(holder.image)
+
+        holder.itemView.setOnClickListener {
+            onItemClick(contact)
+        }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<Contact>() {
-        override fun areItemsTheSame(old: Contact, new: Contact) = old.id == new.id
-        override fun areContentsTheSame(old: Contact, new: Contact) = old == new
+        override fun areItemsTheSame(oldItem: Contact, newItem: Contact) = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Contact, newItem: Contact) = oldItem == newItem
     }
 }
+
+

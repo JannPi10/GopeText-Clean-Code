@@ -8,10 +8,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.gopetext.R
-import com.example.gopetext.auth.chat.ChatActivity
+import com.example.gopetext.auth.home.users.chat.ChatActivity
 import com.example.gopetext.auth.home.fragments.chats.ChatsFragment
 import com.example.gopetext.auth.home.fragments.groups.CreateGroupFragment
 import com.example.gopetext.auth.home.fragments.profile.ProfileFragment
+import com.example.gopetext.auth.home.users.UsersFragment
 import com.example.gopetext.auth.login.LoginActivity
 import com.example.gopetext.data.api.ApiClient
 import com.example.gopetext.data.api.AuthService
@@ -58,11 +59,16 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
                         .commit()
                     true
                 }
+                R.id.nav_users -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, UsersFragment())
+                        .commit()
+                    true
+                }
                 R.id.nav_profile -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.fragment_container, ProfileFragment())
                         .commit()
-                    Log.d("SessionManager", "Token actual: ${sessionManager.getAccessToken()}")
                     true
                 }
                 R.id.logout -> {

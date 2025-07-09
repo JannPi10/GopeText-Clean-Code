@@ -48,7 +48,7 @@
             android:theme="@style/Theme.GopeText" />
 
         <activity
-            android:name=".auth.chat.ChatActivity"
+            android:name=".auth.home.users.chat.ChatActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.GopeText" />

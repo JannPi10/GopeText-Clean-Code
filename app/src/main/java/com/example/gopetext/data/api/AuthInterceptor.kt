@@ -9,23 +9,24 @@ import okhttp3.Response
 class AuthInterceptor(private val sessionManager: SessionManager) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val token = sessionManager.getAccessToken()
-        val request = chain.request()
+        val originalRequest = chain.request()
+        val isMultipart = originalRequest.body?.contentType()?.subtype == "form-data"
 
-        val isMultipart = request.body?.contentType()?.subtype == "form-data"
-
-        val requestBuilder = request.newBuilder()
+        val requestBuilder = originalRequest.newBuilder()
 
         if (!isMultipart) {
             requestBuilder.addHeader("Content-Type", "application/json")
         }
 
         token?.let {
+            Log.d("AuthInterceptor", "Agregando token de autorización")
             requestBuilder.addHeader("Authorization", "Bearer $it")
-        }
+        } ?: Log.w("AuthInterceptor", "Token no encontrado. Se enviará la solicitud sin Authorization.")
 
         return chain.proceed(requestBuilder.build())
     }
 }
+
 
 
 

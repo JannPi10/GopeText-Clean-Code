@@ -1,7 +1,11 @@
 package com.example.gopetext.data.model
 
 data class Contact(
-    val id: String,
+    val id: Int,
+    val is_group: Boolean,
     val name: String,
-    val profileImageUrl: String? = null
+    val profile_image_url: String?,
+    val user_id: Int?, // puede ser null en grupos
+    val members_count: Int? // solo si es grupo
 )
+

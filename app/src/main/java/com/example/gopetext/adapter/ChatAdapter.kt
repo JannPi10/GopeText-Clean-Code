@@ -1,5 +1,6 @@
 package com.example.gopetext.auth.chat
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,14 +21,14 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         private val timeFormatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
 
-        fun formatTimestamp(raw: String): String {
-            return try {
-                val millis = raw.toLong()
-                val date = Date(millis)
-                timeFormatter.format(date)
+        fun formatTimestamp(raw: String?): String {
+            val millis = try {
+                raw?.toLong()  // Si es válido, úsalo
             } catch (e: Exception) {
-                raw
-            }
+                null
+            } ?: System.currentTimeMillis()  // Si es null o no se puede convertir, usa la hora actual
+
+            return timeFormatter.format(Date(millis))
         }
     }
 
@@ -79,6 +80,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         private val textDatetime: TextView = itemView.findViewById(datetimeTextId)
 
         open fun bind(message: Message) {
+            Log.d("ChatAdapter", "Mostrando mensaje: ${message.content}, timestamp: ${message.timestamp}")
             textMessage.text = message.content
             textDatetime.text = formatTimestamp(message.timestamp)
         }

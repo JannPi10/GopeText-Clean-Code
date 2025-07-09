@@ -1,9 +1,8 @@
 package com.example.gopetext.data.api
 
-import java.sql.Timestamp
+import com.google.gson.annotations.SerializedName
 
-class SendMessageRequest (
-
-    val content: String,
-
+data class SendMessageRequest(
+    @SerializedName("message")
+    val message: String
 )

@@ -1,12 +1,11 @@
 package com.example.gopetext.data.model
 
-
-
-
-class Message (
-    val id : String,
-    val content : String,
-    val timestamp : String,
-    val isMine : Boolean
+data class Message(
+    val id: Int,
+    val content: String,
+    val timestamp: String?,  // <-- antes era String, ahora puede ser null
+    val isMine: Boolean
 )
+
+
 

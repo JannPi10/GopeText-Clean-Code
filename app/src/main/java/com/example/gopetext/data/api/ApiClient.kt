@@ -1,6 +1,7 @@
 package com.example.gopetext.data.api
 
 import android.content.Context
+import android.util.Log
 import com.example.gopetext.data.storage.SessionManager
 import com.example.gopetext.utils.Constants
 import okhttp3.OkHttpClient
@@ -23,15 +24,19 @@ object ApiClient {
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
+
+        Log.d("ApiClient", "Retrofit inicializado con baseUrl: ${Constants.BASE_URL}")
     }
 
     fun getService(): AuthService {
         if (!::retrofit.isInitialized) {
+            Log.e("ApiClient", "Error: ApiClient no inicializado antes de usar getService()")
             throw IllegalStateException("ApiClient no ha sido inicializado.")
         }
         return retrofit.create(AuthService::class.java)
     }
 }
+
 
 
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
     android:background="@color/primary_dark"
-    tools:context=".auth.chat.ChatActivity">
+    tools:context=".auth.home.users.chat.ChatActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/myToolbar"
