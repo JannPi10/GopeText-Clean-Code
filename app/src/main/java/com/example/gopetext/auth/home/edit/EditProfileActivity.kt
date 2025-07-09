@@ -100,7 +100,7 @@ class EditProfileActivity : AppCompatActivity(), EditProfileContract.View {
 
     override fun showSuccess(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        finish() // ← Al terminar, vuelve al fragment y onResume() lo recargará
+        finish()
     }
 
     override fun showError(message: String) {

@@ -48,7 +48,7 @@ class UsersFragment : Fragment(), UsersContract.View {
 
     override fun navigateToChat(chatId: Int, user: UserChat) {
         val intent = Intent(requireContext(), ChatActivity::class.java).apply {
-            putExtra("chat_id", chatId)
+            putExtra("chatId", chatId)
             putExtra("receiver_id", user.id)
             putExtra("receiver_name", user.name)
             putExtra("receiver_image_url", user.profile_image_url)

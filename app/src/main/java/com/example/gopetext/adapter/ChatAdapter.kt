@@ -23,7 +23,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         fun formatTimestamp(raw: String?): String {
             val millis = try {
-                raw?.toLong()  // Si es válido, úsalo
+                raw?.toLong()
             } catch (e: Exception) {
                 null
             } ?: System.currentTimeMillis()  // Si es null o no se puede convertir, usa la hora actual
