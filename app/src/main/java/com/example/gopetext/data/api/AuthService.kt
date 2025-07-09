@@ -10,6 +10,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.PartMap
 
 interface AuthService {
 
@@ -25,19 +26,22 @@ interface AuthService {
     @GET("api/user")
     suspend fun getUserProfile(): Response<UserSingleResponse>
 
-    @Multipart
     @PUT("api/user")
-    suspend fun showUserProfile(
-        @Part("name") name: RequestBody,
-        @Part("last_name") lastName: RequestBody,
-        @Part("age") age: RequestBody
-    ): Response<ShowProfileResponse>
+    suspend fun updateUserProfile(
+        @Body request: UpdateUserRequest
+    ): Response<Any>
 
     @Multipart
-    @POST("api/user/profile/image")
+    @POST("api/user/profile-image")
     suspend fun uploadProfileImage(
-        @Part nombreimagen: MultipartBody.Part
+        @Part image: MultipartBody.Part
     ): Response<UploadProfileImageResponse>
+
+    //@GET("api/users")
+    //suspend fun getAllUsers(): Response<ListUsersResponse>
+
+    @POST("api/chats/group")
+    suspend fun createGroup(@Body request: CreateGroupRequest): Response<Unit>
 
     @GET("api/users")
     suspend fun getAllUsers(): Response<ListUsersResponse>

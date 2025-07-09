@@ -1,5 +1,7 @@
 package com.example.gopetext.data.api
 
 data class UploadProfileImageResponse(
-    val message: String
+    val message: String,
+    val profile_image_url : String
 )
+

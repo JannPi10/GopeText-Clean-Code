@@ -11,6 +11,7 @@ class SessionManager(context: Context) {
     companion object {
         private const val PREFS_NAME = "gopetext_prefs"
         private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_USER_ID = "user_id" // 👈 Agregado
     }
 
     fun saveAccessToken(token: String) {
@@ -21,8 +22,20 @@ class SessionManager(context: Context) {
         return prefs.getString(KEY_ACCESS_TOKEN, null)
     }
 
+    fun saveUserId(userId: Int) { // 👈 Agregado
+        prefs.edit().putInt(KEY_USER_ID, userId).apply()
+    }
+
+    fun getUserId(): Int { // 👈 Agregado
+        return prefs.getInt(KEY_USER_ID, -1)
+    }
+
     fun clearSession() {
         prefs.edit().clear().apply()
     }
 
+    fun fetchAuthToken(): String? {
+        return prefs.getString("token", null)
+    }
 }
+

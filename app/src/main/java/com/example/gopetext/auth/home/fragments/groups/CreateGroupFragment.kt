@@ -1,10 +1,12 @@
 package com.example.gopetext.auth.home.fragments.groups
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,9 +24,7 @@ class CreateGroupFragment : Fragment(), CreateGroupContract.View {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_create_group, container, false)
-    }
+    ): View = inflater.inflate(R.layout.fragment_create_group, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         sessionManager = SessionManager(requireContext())
@@ -32,28 +32,35 @@ class CreateGroupFragment : Fragment(), CreateGroupContract.View {
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.rvUsers)
         val btnCreate = view.findViewById<Button>(R.id.btnCreateGroup)
+        val etGroupName = view.findViewById<EditText>(R.id.etGroupName)
 
         userAdapter = UserAdapter()
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = userAdapter
 
-        presenter.loadUsers()
+        val currentUserId = sessionManager.getUserId()
+        presenter.loadUsers(currentUserId)
 
         btnCreate.setOnClickListener {
             val selectedUsers = userAdapter.getSelectedUsers()
-            presenter.createGroup(selectedUsers)
+            Log.d("CreateGroupFragment", "Usuarios seleccionados para grupo: ${selectedUsers.map { it.name }}")
+            val groupName = etGroupName.text.toString().trim()
+            presenter.createGroup(groupName, selectedUsers)
         }
     }
 
     override fun showUsers(users: List<UserChat>) {
+        Log.d("CreateGroupFragment", "Mostrando ${users.size} usuarios en RecyclerView")
         userAdapter.setUsers(users)
     }
 
     override fun showSuccess(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        // Aquí podrías notificar a tu ChatFragment que refresque los grupos
     }
 
     override fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 }
+

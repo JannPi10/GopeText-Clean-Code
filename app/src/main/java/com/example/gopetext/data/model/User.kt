@@ -1,9 +1,12 @@
 package com.example.gopetext.data.model
 
+import com.google.gson.annotations.SerializedName
+
 data class User(
     val name: String,
-    val last_name: String,
-    val age: Int,
+    @SerializedName("last_name") val last_name: String,
     val email: String,
-    val profile_image_url: String
+    val age: Int,
+    @SerializedName("profile_image_url") val profile_image_url: String?
 )
+

@@ -7,12 +7,17 @@ import okhttp3.Response
 
 
 class AuthInterceptor(private val sessionManager: SessionManager) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): Response {
+    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
         val token = sessionManager.getAccessToken()
-        Log.d("AuthInterceptor", "Token enviado: Bearer $token")
+        val request = chain.request()
 
-        val requestBuilder = chain.request().newBuilder()
-            .addHeader("Content-Type", "application/json")
+        val isMultipart = request.body?.contentType()?.subtype == "form-data"
+
+        val requestBuilder = request.newBuilder()
+
+        if (!isMultipart) {
+            requestBuilder.addHeader("Content-Type", "application/json")
+        }
 
         token?.let {
             requestBuilder.addHeader("Authorization", "Bearer $it")
@@ -21,5 +26,6 @@ class AuthInterceptor(private val sessionManager: SessionManager) : Interceptor 
         return chain.proceed(requestBuilder.build())
     }
 }
+
 
 

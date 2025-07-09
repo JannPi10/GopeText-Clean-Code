@@ -16,6 +16,7 @@ import com.example.gopetext.R
 import com.example.gopetext.auth.home.edit.EditProfileActivity
 import com.example.gopetext.data.model.User
 import com.example.gopetext.data.storage.SessionManager
+import com.example.gopetext.utils.Constants
 
 class ProfileFragment : Fragment(), ProfileContract.View {
 
@@ -49,13 +50,16 @@ class ProfileFragment : Fragment(), ProfileContract.View {
         ivProfileImage = view.findViewById(R.id.imgProfile)
         btnEdit = view.findViewById(R.id.btnEdit)
 
-        // Abrir actividad de edición
         btnEdit.setOnClickListener {
             val intent = Intent(requireContext(), EditProfileActivity::class.java)
             startActivity(intent)
         }
 
-        // ✅ Carga los datos del usuario logueado
+        presenter.loadUserData()
+    }
+
+    override fun onResume() { // 👈 Para que cargue cada vez que regreses
+        super.onResume()
         presenter.loadUserData()
     }
 
@@ -64,11 +68,22 @@ class ProfileFragment : Fragment(), ProfileContract.View {
         etLastName.text = user.last_name
         etAge.text = user.age.toString()
         etEmail.text = user.email
-        if (!user.profile_image_url.isNullOrBlank()) {
-            Glide.with(requireContext()).load(user.profile_image_url).into(ivProfileImage)
+
+        val imageUrl = user.profile_image_url?.let {
+            if (it.startsWith("http")) it else Constants.BASE_URL + it.removePrefix("/")
+        }
+
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(requireContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.ic_baseline_person_24)
+                .circleCrop()
+                .error(R.drawable.ic_baseline_person_24)
+                .into(ivProfileImage)
         } else {
             ivProfileImage.setImageResource(R.drawable.ic_baseline_person_24)
         }
+
         Log.d("DEBUG", "Usuario recibido: $user")
     }
 
@@ -80,4 +95,5 @@ class ProfileFragment : Fragment(), ProfileContract.View {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 }
+
 

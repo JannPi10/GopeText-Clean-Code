@@ -10,7 +10,7 @@ interface CreateGroupContract {
     }
 
     interface Presenter {
-        fun loadUsers()
-        fun createGroup(selectedUsers: List<UserChat>)
+        fun loadUsers(currentUserId: Int)
+        fun createGroup(name: String, selectedUsers: List<UserChat>)
     }
 }

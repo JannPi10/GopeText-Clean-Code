@@ -2,8 +2,7 @@ package com.example.gopetext.auth.home.fragments.groups
 
 import android.util.Log
 import com.example.gopetext.data.api.ApiClient
-import com.example.gopetext.data.api.AuthService
-import com.example.gopetext.data.model.User
+import com.example.gopetext.data.api.CreateGroupRequest
 import com.example.gopetext.data.model.UserChat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -16,47 +15,73 @@ class CreateGroupPresenter(
 
     private val api = ApiClient.getService()
 
-    override fun loadUsers() {
+    override fun loadUsers(currentUserId: Int) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = api.getAllUsers()
-                if (response.isSuccessful && response.body() != null) {
-                    val users = response.body()!!.users
+                if (response.isSuccessful) {
+                    val allUsers = response.body()?.users ?: emptyList()
+                    val filtered = allUsers.filter { it.id != currentUserId }
+
+                    Log.d("CreateGroup", "Usuarios recibidos: ${allUsers.size}")
+                    Log.d("CreateGroup", "Usuarios después de filtrar actual: ${filtered.size}")
+
                     withContext(Dispatchers.Main) {
-                        view.showUsers(users)
+                        view.showUsers(filtered)
                     }
                 } else {
+                    Log.e("CreateGroup", "Fallo al obtener usuarios: ${response.code()}")
                     withContext(Dispatchers.Main) {
-                        view.showError("Error al cargar usuarios")
+                        view.showError("No se pudieron cargar los usuarios")
                     }
                 }
             } catch (e: Exception) {
-                Log.e("CreateGroup", "Error: ${e.message}")
+                Log.e("CreateGroup", "Error al obtener usuarios: ${e.message}")
                 withContext(Dispatchers.Main) {
-                    view.showError("Fallo de red")
+                    view.showError("Error de red: ${e.message}")
                 }
             }
         }
     }
 
-    override fun createGroup(selectedUsers: List<UserChat>) {
+    override fun createGroup(name: String, selectedUsers: List<UserChat>) {
+        if (name.isBlank()) {
+            view.showError("Ingresa un nombre para el grupo")
+            return
+        }
+
+        if (selectedUsers.isEmpty()) {
+            view.showError("Selecciona al menos una persona")
+            return
+        }
+
+        val userIds = selectedUsers.map { it.id }
+        val request = CreateGroupRequest(name = name, userIds = userIds)
+
+        Log.d("CreateGroup", "Intentando crear grupo con: $request")
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Simulación de creación de grupo
-                Log.d("CreateGroup", "Usuarios seleccionados: $selectedUsers")
-                withContext(Dispatchers.Main) {
-                    if (selectedUsers.isEmpty()) {
-                        view.showSuccess("Selecciona primero una persona")
+                val response = api.createGroup(request)
+                if (response.isSuccessful) {
+                    Log.d("CreateGroup", "Grupo creado con éxito")
+                    withContext(Dispatchers.Main) {
+                        view.showSuccess("Grupo creado correctamente")
                     }
-                    else {
-                        view.showSuccess("Grupo creado con ${selectedUsers.size} personas")
+                } else {
+                    Log.e("CreateGroup", "Error HTTP al crear grupo: ${response.code()}")
+                    withContext(Dispatchers.Main) {
+                        view.showError("No se pudo crear el grupo (código: ${response.code()})")
                     }
                 }
             } catch (e: Exception) {
+                Log.e("CreateGroup", "Excepción al crear grupo: ${e.message}")
                 withContext(Dispatchers.Main) {
-                    view.showError("Error al crear grupo")
+                    view.showError("Error de red: ${e.message}")
                 }
             }
         }
     }
 }
+
+

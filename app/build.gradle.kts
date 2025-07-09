@@ -82,5 +82,7 @@ dependencies {
     //RoundedImageView
     implementation(libs.roundedimageview)
 
-
+    //Glide
+    implementation(libs.glide.v4151)
+    //annotationProcessor(libs.compiler.v4151)
 }

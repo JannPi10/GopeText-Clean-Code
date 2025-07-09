@@ -3,6 +3,7 @@ package com.example.gopetext.auth.home.fragments.profile
 import android.util.Log
 import com.example.gopetext.data.api.ApiClient
 import com.example.gopetext.data.api.AuthService
+import com.example.gopetext.data.api.UpdateUserRequest
 import com.example.gopetext.data.storage.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class ProfilePresenter(
@@ -24,9 +26,8 @@ class ProfilePresenter(
             try {
                 Log.d("DEBUG", "Llamando a getUserProfile()")
                 val response = api.getUserProfile()
-                Log.d("DEBUG", "Respuesta: ${response.code()} - ${response.body()}")
                 if (response.isSuccessful && response.body() != null) {
-                    val user = response.body()!!.user // ahora sí es un solo User, no una lista
+                    val user = response.body()!!.user
                     withContext(Dispatchers.Main) {
                         view.showUserData(user)
                     }
@@ -44,30 +45,30 @@ class ProfilePresenter(
         }
     }
 
-    override fun showUser(name: String, lastName: String, age : Int, photo: MultipartBody.Part?) {
+    override fun showUser(name: String, lastName: String, age: Int, photo: MultipartBody.Part?) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val nameBody = name.toRequestBody("text/plain".toMediaTypeOrNull())
-                val lastNameBody = lastName.toRequestBody("text/plain".toMediaTypeOrNull())
-                val ageBody = age.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-
-                val nameUpdate = api.showUserProfile(nameBody, lastNameBody, ageBody)
+                // Actualizar texto como JSON
+                val request = UpdateUserRequest(name, lastName, age)
+                val userResponse = api.updateUserProfile(request)
 
                 withContext(Dispatchers.Main) {
-                    if (nameUpdate.isSuccessful && nameUpdate.body() != null) {
-                        view.showUpdateSuccess("Perfil")
+                    if (userResponse.isSuccessful) {
+                        view.showUpdateSuccess("Perfil actualizado correctamente")
                     } else {
-                        view.showError("Error al mostrar el perfil")
+                        view.showError("Error al actualizar el perfil")
                     }
                 }
 
+                // Actualizar imagen si existe
                 if (photo != null) {
-                    val photoUpdate = api.uploadProfileImage(photo)
+                    val imageResponse = api.uploadProfileImage(photo)
+
                     withContext(Dispatchers.Main) {
-                        if (photoUpdate.isSuccessful && photoUpdate.body() != null) {
-                            view.showUpdateSuccess("Foto de perfil")
+                        if (imageResponse.isSuccessful && imageResponse.body() != null) {
+                            view.showUpdateSuccess("Foto de perfil actualizada")
                         } else {
-                            view.showError("Error al mostrar la foto")
+                            view.showError("Error al subir la imagen")
                         }
                     }
                 }
@@ -79,6 +80,8 @@ class ProfilePresenter(
             }
         }
     }
+
 }
+
 
 
