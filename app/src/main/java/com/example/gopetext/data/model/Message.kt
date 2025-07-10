@@ -1,11 +1,21 @@
 package com.example.gopetext.data.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Message(
+    @SerializedName("id")
     val id: Int,
+
+    @SerializedName("content")
     val content: String,
-    val timestamp: String?,  // <-- antes era String, ahora puede ser null
-    val isMine: Boolean
+
+    @SerializedName("timestamp")
+    val timestamp: String?,
+
+    @SerializedName("sender")
+    val sender: Int
 )
+
 
 
 

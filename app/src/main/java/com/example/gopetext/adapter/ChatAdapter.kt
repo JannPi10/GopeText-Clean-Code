@@ -11,7 +11,7 @@ import com.example.gopetext.data.model.Message
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class ChatAdapter(private val currentUserId: Int) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val messages: MutableList<Message> = mutableListOf()
 
@@ -26,8 +26,7 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
                 raw?.toLong()
             } catch (e: Exception) {
                 null
-            } ?: System.currentTimeMillis()  // Si es null o no se puede convertir, usa la hora actual
-
+            } ?: System.currentTimeMillis()
             return timeFormatter.format(Date(millis))
         }
     }
@@ -44,7 +43,12 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position].isMine) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
+        val message = messages[position]
+        val isSent = message.sender == currentUserId
+
+        Log.d("ChatAdapter", "Pos: $position | sender: ${message.sender}, currentUserId: $currentUserId, es mío? $isSent")
+
+        return if (isSent) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -98,5 +102,4 @@ class ChatAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         R.id.textDatetime
     )
 }
-
 

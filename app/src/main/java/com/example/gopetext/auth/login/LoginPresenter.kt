@@ -32,10 +32,20 @@ class LoginPresenter(
                     Log.d("LoginPresenter", "Login exitoso: token=${body.token}")
 
                     sessionManager.saveAccessToken(body.token)
+                    sessionManager.saveUserId(body.user_id)
+
+                    try {
+                        val userId = body.user_id.toInt()
+                        sessionManager.saveUserId(userId)
+                        Log.d("LoginPresenter", "Guardado userId: $userId")
+                    } catch (e: NumberFormatException) {
+                        Log.e("LoginPresenter", "user_id no es un número válido: ${body.user_id}", e)
+                    }
 
                     withContext(Dispatchers.Main) {
                         view.showLoginSuccess()
                     }
+
                 }
                 else {
                     val errorMessage = when (response.code()) {
