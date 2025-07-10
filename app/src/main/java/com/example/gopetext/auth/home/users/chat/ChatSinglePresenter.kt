@@ -5,6 +5,7 @@ import android.os.Looper
 import android.util.Log
 import com.example.gopetext.data.api.ApiClient
 import com.example.gopetext.data.api.ChatService
+import com.example.gopetext.data.api.CreateGroupRequest
 import com.example.gopetext.data.api.SendMessageRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,9 +15,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class ChatPresenter(
-    private val view: ChatContract.View
-) : ChatContract.Presenter {
+class ChatSinglePresenter(
+    private val view: ChatSingleContract.View
+) : ChatSingleContract.Presenter {
 
     private var chatId: Int = -1
     private var isActive = true
@@ -30,17 +31,12 @@ class ChatPresenter(
     }
 
     override fun loadMessages() {
-        if (chatId <= 0) {
-            Log.e("ChatPresenter", "chatId inválido: $chatId")
-            return
-        }
+        if (chatId <= 0) return
 
         scope.launch {
             try {
                 val response = chatService.getMessages(chatId)
                 val messages = response.messages
-
-                Log.d("ChatPresenter", "Mensajes obtenidos: ${messages.size}")
 
                 withContext(Dispatchers.Main) {
                     if (isActive) {
@@ -50,43 +46,28 @@ class ChatPresenter(
                 }
 
             } catch (e: Exception) {
-                Log.e("ChatPresenter", "Excepción al cargar mensajes", e)
                 withContext(Dispatchers.Main) {
                     view.showError("Error al cargar mensajes: ${e.localizedMessage}")
                 }
             }
         }
 
-        // Evitamos múltiples recargas paralelas si el handler ya está activo
         handler.removeCallbacksAndMessages(null)
-
-        handler.postDelayed({
-            if (isActive) {
-                Log.d("ChatPresenter", "Recargando mensajes automáticamente")
-                loadMessages()
-            }
-        }, 5000)
+        handler.postDelayed({ if (isActive) loadMessages() }, 5000)
     }
 
     override fun sendMessage(chatId: Int, message: SendMessageRequest) {
-        Log.d("ChatPresenter", "Enviando mensaje: ${message.message}")
-
         scope.launch {
             try {
                 val response = chatService.sendMessage(chatId, message)
-
                 if (response.isSuccessful) {
-                    Log.d("ChatPresenter", "Mensaje enviado correctamente")
                     loadMessages()
                 } else {
-                    Log.e("ChatPresenter", "Error al enviar mensaje: ${response.code()} ${response.errorBody()?.string()}")
                     withContext(Dispatchers.Main) {
                         view.showError("No se pudo enviar el mensaje")
                     }
                 }
-
             } catch (e: Exception) {
-                Log.e("ChatPresenter", "Excepción al enviar mensaje", e)
                 withContext(Dispatchers.Main) {
                     view.showError("Error al enviar mensaje: ${e.localizedMessage}")
                 }
@@ -94,13 +75,37 @@ class ChatPresenter(
         }
     }
 
+    override fun leaveGroup(chatId: Int) {
+        scope.launch {
+            try {
+                val request = CreateGroupRequest(name = "none", members = listOf())
+                val response = chatService.leaveGroup(chatId, request)
+
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        Log.d("ChatPresenter", "Saliste del grupo con éxito")
+                        view.onLeftGroup()
+                    } else {
+                        Log.e("ChatPresenter", "Error al salir del grupo: ${response.code()}")
+                        view.showError("No se pudo abandonar el grupo")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("ChatPresenter", "Excepción al abandonar grupo", e)
+                withContext(Dispatchers.Main) {
+                    view.showError("Error: ${e.localizedMessage}")
+                }
+            }
+        }
+    }
+
     override fun onDestroy() {
-        Log.d("ChatPresenter", "Presenter destruido. Cancelando corutinas y Handler.")
         isActive = false
         handler.removeCallbacksAndMessages(null)
         scope.cancel()
     }
 }
+
 
 
 

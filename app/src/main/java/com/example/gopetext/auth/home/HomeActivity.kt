@@ -2,20 +2,16 @@ package com.example.gopetext.auth.home
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.gopetext.R
-import com.example.gopetext.auth.home.users.chat.ChatActivity
-import com.example.gopetext.auth.home.fragments.chats.ChatsFragment
+import com.example.gopetext.auth.home.fragments.chats.ChatsListFragment
 import com.example.gopetext.auth.home.fragments.groups.CreateGroupFragment
 import com.example.gopetext.auth.home.fragments.profile.ProfileFragment
 import com.example.gopetext.auth.home.users.UsersFragment
 import com.example.gopetext.auth.login.LoginActivity
 import com.example.gopetext.data.api.ApiClient
-import com.example.gopetext.data.api.AuthService
 import com.example.gopetext.data.storage.SessionManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -49,7 +45,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
             when (item.itemId) {
                 R.id.nav_chats -> {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, ChatsFragment())
+                        .replace(R.id.fragment_container, ChatsListFragment())
                         .commit()
                     true
                 }

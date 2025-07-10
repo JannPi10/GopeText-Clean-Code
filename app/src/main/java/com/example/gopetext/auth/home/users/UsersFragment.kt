@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gopetext.auth.home.users.chat.ChatActivity
+import com.example.gopetext.auth.home.users.chat.ChatSingleActivity
 import android.view.View
 import com.example.gopetext.data.model.UserChat
 import com.example.gopetext.databinding.FragmentUserBinding
@@ -47,7 +47,7 @@ class UsersFragment : Fragment(), UsersContract.View {
     }
 
     override fun navigateToChat(chatId: Int, user: UserChat) {
-        val intent = Intent(requireContext(), ChatActivity::class.java).apply {
+        val intent = Intent(requireContext(), ChatSingleActivity::class.java).apply {
             putExtra("chatId", chatId)
             putExtra("receiver_id", user.id)
             putExtra("receiver_name", user.name)

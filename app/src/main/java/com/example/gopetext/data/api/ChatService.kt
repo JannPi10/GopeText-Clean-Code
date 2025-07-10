@@ -24,6 +24,12 @@ interface ChatService {
         @Path("chatId") chatId: Int,
         @Body request: SendMessageRequest
     ): Response<Message>
+
+    @POST("api/chats/{chatId}/leave")
+    suspend fun leaveGroup(
+        @Path("chatId") chatId: Int,
+        @Body request: CreateGroupRequest
+    ): Response<Unit>
 }
 
 

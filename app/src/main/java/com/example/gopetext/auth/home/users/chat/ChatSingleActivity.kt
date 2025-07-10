@@ -1,9 +1,10 @@
 package com.example.gopetext.auth.home.users.chat
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,24 +17,33 @@ import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gopetext.R
+import android.view.View
+import android.widget.TextView
 import com.example.gopetext.auth.chat.ChatAdapter
 import com.example.gopetext.data.api.SendMessageRequest
 import com.example.gopetext.data.model.Message
 
-class ChatActivity : AppCompatActivity(), ChatContract.View {
+class ChatSingleActivity : AppCompatActivity(), ChatSingleContract.View {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ChatAdapter
     private lateinit var inputMessage: EditText
     private lateinit var sendIcon: ImageView
-    private lateinit var presenter: ChatContract.Presenter
+    private lateinit var textName: TextView
+    private lateinit var btnLeaveGroup: ImageView
+    private lateinit var presenter: ChatSingleContract.Presenter
+
     private var chatId: Int = -1
+    private var isGroup: Boolean = false
+    private var chatName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
         chatId = intent.getIntExtra("chatId", -1)
+        isGroup = intent.getBooleanExtra("isGroup", false)
+        chatName = intent.getStringExtra("chatName")
 
         if (chatId <= 0) {
             Log.e("ChatActivity", "chatId inválido recibido: $chatId")
@@ -42,7 +52,7 @@ class ChatActivity : AppCompatActivity(), ChatContract.View {
             return
         }
 
-        presenter = ChatPresenter(this)
+        presenter = ChatSinglePresenter(this)
         presenter.setChatId(chatId)
 
         initViews()
@@ -55,9 +65,20 @@ class ChatActivity : AppCompatActivity(), ChatContract.View {
         recyclerView = findViewById(R.id.chatRecyclerview)
         inputMessage = findViewById(R.id.inputMessage)
         sendIcon = findViewById(R.id.sendIcon)
+        textName = findViewById(R.id.textName)
+        btnLeaveGroup = findViewById(R.id.btnLeaveGroup)
+
+        textName.text = chatName ?: "Chat"
 
         findViewById<AppCompatImageView>(R.id.imageBack).setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
+        }
+
+        if (isGroup) {
+            btnLeaveGroup.visibility = View.VISIBLE
+            btnLeaveGroup.setOnClickListener { showLeaveGroupConfirmation() }
+        } else {
+            btnLeaveGroup.visibility = View.GONE
         }
     }
 
@@ -70,8 +91,6 @@ class ChatActivity : AppCompatActivity(), ChatContract.View {
     private fun setupListeners() {
         sendIcon.setOnClickListener {
             val content = inputMessage.text.toString().trim()
-            Log.d("ChatActivity", "Click en enviar - mensaje: $content")
-
             if (content.isNotEmpty()) {
                 presenter.sendMessage(chatId, SendMessageRequest(content))
                 inputMessage.text.clear()
@@ -79,13 +98,22 @@ class ChatActivity : AppCompatActivity(), ChatContract.View {
         }
     }
 
+    private fun showLeaveGroupConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle("Abandonar grupo")
+            .setMessage("¿Estás seguro de que quieres salir del grupo?")
+            .setPositiveButton("Sí") { _, _ ->
+                presenter.leaveGroup(chatId)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
     override fun showMessages(messages: List<Message>) {
-        Log.d("ChatActivity", "Mostrando ${messages.size} mensajes")
         adapter.setMessages(messages)
     }
 
     override fun showError(message: String) {
-        Log.e("ChatActivity", "Error mostrado al usuario: $message")
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
@@ -122,6 +150,11 @@ class ChatActivity : AppCompatActivity(), ChatContract.View {
         notificationManager.notify(notificationId, builder.build())
     }
 
+    override fun onLeftGroup() {
+        setResult(Activity.RESULT_OK)
+        finish()
+    }
+
     override fun onDestroy() {
         if (this::presenter.isInitialized) {
             presenter.onDestroy()
@@ -129,5 +162,6 @@ class ChatActivity : AppCompatActivity(), ChatContract.View {
         super.onDestroy()
     }
 }
+
 
 

@@ -14,9 +14,9 @@ import com.example.gopetext.R
 import com.example.gopetext.data.model.Contact
 import com.example.gopetext.utils.Constants
 
-class ChatsAdapter(
+class ChatsListAdapter(
     private val onItemClick: (Contact) -> Unit
-) : ListAdapter<Contact, ChatsAdapter.ChatViewHolder>(DiffCallback()) {
+) : ListAdapter<Contact, ChatsListAdapter.ChatViewHolder>(DiffCallback()) {
 
     class ChatViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.txtUserName)
@@ -38,11 +38,14 @@ class ChatsAdapter(
             if (it.startsWith("http")) it else Constants.BASE_URL + it.removePrefix("/")
         }
 
-        Glide.with(holder.itemView.context)
-            .load(imageUrl)
-            .placeholder(R.drawable.ic_baseline_person_24)
-            .circleCrop()
-            .into(holder.image)
+        if (!imageUrl.isNullOrEmpty()) {
+            Glide.with(holder.itemView.context)
+                .load(imageUrl)
+                .placeholder(R.drawable.ic_baseline_person_24)
+                .into(holder.image)
+        } else {
+            holder.image.setImageResource(R.drawable.ic_baseline_person_24)
+        }
 
         holder.itemView.setOnClickListener {
             onItemClick(contact)

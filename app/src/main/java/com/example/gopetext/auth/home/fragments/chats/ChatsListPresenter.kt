@@ -1,17 +1,16 @@
 package com.example.gopetext.auth.home.fragments.chats
 
 import android.util.Log
-import com.example.gopetext.data.api.AuthService
 import com.example.gopetext.data.api.ChatService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ChatsPresenter(
-    private val view: ChatsContract.View,
+class ChatsListPresenter(
+    private val view: ChatsListContract.View,
     private val chatService: ChatService
-) : ChatsContract.Presenter {
+) : ChatsListContract.Presenter {
 
     override fun loadChats() {
         CoroutineScope(Dispatchers.IO).launch {

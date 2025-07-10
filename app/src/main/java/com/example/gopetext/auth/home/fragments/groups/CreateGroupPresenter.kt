@@ -56,9 +56,11 @@ class CreateGroupPresenter(
         }
 
         val userIds = selectedUsers.map { it.id }
-        val request = CreateGroupRequest(name = name, userIds = userIds)
+        val request = CreateGroupRequest(name = name, members = userIds)
 
         Log.d("CreateGroup", "Intentando crear grupo con: $request")
+
+        Log.d("CreateGroupRequest", "Payload: name=${request.name}, members=${request.members}")
 
         CoroutineScope(Dispatchers.IO).launch {
             try {

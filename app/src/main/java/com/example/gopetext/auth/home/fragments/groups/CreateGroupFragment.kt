@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gopetext.R
+import com.example.gopetext.auth.home.fragments.chats.ChatsListFragment
 import com.example.gopetext.data.model.UserChat
 import com.example.gopetext.data.storage.SessionManager
 
@@ -27,6 +28,8 @@ class CreateGroupFragment : Fragment(), CreateGroupContract.View {
     ): View = inflater.inflate(R.layout.fragment_create_group, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         sessionManager = SessionManager(requireContext())
         presenter = CreateGroupPresenter(this)
 
@@ -56,7 +59,12 @@ class CreateGroupFragment : Fragment(), CreateGroupContract.View {
 
     override fun showSuccess(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-        // Aquí podrías notificar a tu ChatFragment que refresque los grupos
+
+        // Notificamos a ChatsListFragment que se creó un grupo
+        parentFragmentManager.setFragmentResult("group_created", Bundle())
+
+        // Volvemos al fragmento anterior (ChatsListFragment ya está en el backstack)
+        parentFragmentManager.popBackStack()
     }
 
     override fun showError(message: String) {

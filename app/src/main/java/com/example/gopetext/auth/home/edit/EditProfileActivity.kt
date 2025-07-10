@@ -110,7 +110,6 @@ class EditProfileActivity : AppCompatActivity(), EditProfileContract.View {
     override fun goBackProfile() {
         finish()
     }
-
 }
 
 
