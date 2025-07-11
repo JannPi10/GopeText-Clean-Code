@@ -2,7 +2,6 @@ package com.example.gopetext.data.storage
 
 import android.content.Context
 import android.content.SharedPreferences
-import kotlin.coroutines.CoroutineContext
 
 class SessionManager(context: Context) {
 
@@ -11,8 +10,10 @@ class SessionManager(context: Context) {
     companion object {
         private const val PREFS_NAME = "gopetext_prefs"
         private const val KEY_ACCESS_TOKEN = "access_token"
-        private const val KEY_USER_ID = "user_id" // 👈 Agregado
+        private const val KEY_USER_ID = "user_id"
     }
+
+
 
     fun saveAccessToken(token: String) {
         prefs.edit().putString(KEY_ACCESS_TOKEN, token).apply()
@@ -22,11 +23,11 @@ class SessionManager(context: Context) {
         return prefs.getString(KEY_ACCESS_TOKEN, null)
     }
 
-    fun saveUserId(userId: Int) { // 👈 Agregado
+    fun saveUserId(userId: Int) {
         prefs.edit().putInt(KEY_USER_ID, userId).apply()
     }
 
-    fun getUserId(): Int { // 👈 Agregado
+    fun getUserId(): Int {
         return prefs.getInt(KEY_USER_ID, -1)
     }
 
@@ -34,5 +35,9 @@ class SessionManager(context: Context) {
         prefs.edit().clear().apply()
     }
 
+    fun fetchAuthToken(): String? {
+        return prefs.getString(KEY_ACCESS_TOKEN, null)
+    }
 }
+
 

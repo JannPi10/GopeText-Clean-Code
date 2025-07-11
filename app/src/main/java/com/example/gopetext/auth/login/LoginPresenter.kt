@@ -19,59 +19,32 @@ class LoginPresenter(
 
     override fun login(email: String, password: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            Log.d("LoginPresenter", "Intentando login con email: $email")
-            Log.d("LoginPresenter", "Intentando login con password: $password")
-
-            val loginRequest = LoginRequest(email, password)
-            Log.d("LoginDebug", "Body JSON que se enviará: $loginRequest")
-
             try {
-                val response = api.login(loginRequest)
+                val response = api.login(LoginRequest(email, password))
                 if (response.isSuccessful && response.body() != null) {
                     val body = response.body()!!
-                    Log.d("LoginPresenter", "Login exitoso: token=${body.token}")
 
                     sessionManager.saveAccessToken(body.token)
                     sessionManager.saveUserId(body.user_id)
 
-                    try {
-                        val userId = body.user_id.toInt()
-                        sessionManager.saveUserId(userId)
-                        Log.d("LoginPresenter", "Guardado userId: $userId")
-                    } catch (e: NumberFormatException) {
-                        Log.e("LoginPresenter", "user_id no es un número válido: ${body.user_id}", e)
-                    }
+                    Log.d("LoginPresenter", "Guardado userId: ${body.user_id}")
 
                     withContext(Dispatchers.Main) {
                         view.showLoginSuccess()
                     }
-
-                }
-                else {
-                    val errorMessage = when (response.code()) {
+                } else {
+                    val message = when (response.code()) {
                         401 -> "Usuario o contraseña incorrectos"
                         404 -> "Usuario no encontrado"
                         else -> "Error desconocido (${response.code()})"
                     }
-
-                    val errorBody = response.errorBody()?.string()
-                    Log.e("LoginPresenter", "Error HTTP ${response.code()}: $errorBody")
-
                     withContext(Dispatchers.Main) {
-                        view.showLoginError(errorMessage)
+                        view.showLoginError(message)
                     }
                 }
-
-            } catch (e: IOException) {
-                Log.e("LoginPresenter", "Error de red: ${e.localizedMessage}", e)
-                withContext(Dispatchers.Main) {
-                    view.showLoginError("Error de conexión. Verifica tu red.")
-                }
-
             } catch (e: Exception) {
-                Log.e("LoginPresenter", "Excepción inesperada", e)
                 withContext(Dispatchers.Main) {
-                    view.showLoginError("${Constants.NETWORK_ERROR}${e.message}")
+                    view.showLoginError("Error: ${e.localizedMessage}")
                 }
             }
         }
@@ -79,9 +52,7 @@ class LoginPresenter(
 
     override fun checkSession() {
         if (!sessionManager.getAccessToken().isNullOrEmpty()) {
-            Log.d("LoginPresenter", "Sesión activa detectada.")
             view.navigateToHome()
         }
     }
 }
-

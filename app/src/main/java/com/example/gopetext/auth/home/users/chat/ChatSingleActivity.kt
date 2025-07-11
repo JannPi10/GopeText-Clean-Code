@@ -44,25 +44,20 @@ class ChatSingleActivity : AppCompatActivity(), ChatSingleContract.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-
         sessionManager = SessionManager(this)
 
-        val rawPrefs = getSharedPreferences("gopetext_prefs", MODE_PRIVATE)
-        val storedId = rawPrefs.getInt("user_id", -1)
-        Log.d("ChatActivity", "Verificando directamente: user_id desde prefs = $storedId")
+// Comprobación directa del valor guardado
+        val sharedPrefs = getSharedPreferences("gopetext_prefs", MODE_PRIVATE)
+        val directUserId = sharedPrefs.getInt("user_id", -1)
+        Log.d("ChatActivity", "🔍 user_id directo desde prefs: $directUserId")
 
+// Intenta obtenerlo desde el SessionManager
         currentUserId = sessionManager.getUserId()
-        Log.d("ChatActivity", "Usuario actual cargado: $currentUserId")
+        Log.d("ChatActivity", "✅ currentUserId obtenido del SessionManager: $currentUserId")
 
         chatId = intent.getIntExtra("chatId", -1)
         isGroup = intent.getBooleanExtra("isGroup", false)
         chatName = intent.getStringExtra("chatName")
-
-        if (currentUserId == -1) {
-            val retryId = sessionManager.getUserId()
-            Log.w("ChatActivity", "userId inicial era -1, recuperado como: $retryId")
-            currentUserId = retryId
-        }
 
         if (chatId <= 0) {
             Log.e("ChatActivity", "chatId inválido recibido: $chatId")
@@ -74,8 +69,8 @@ class ChatSingleActivity : AppCompatActivity(), ChatSingleContract.View {
         presenter = ChatSinglePresenter(this)
         presenter.setChatId(chatId)
 
-        initViews()
-        setupRecyclerView()
+        initViews()           // ✅ Inicializamos views antes de usarlas
+        setupRecyclerView()   // ✅ Ahora ya puedes usar recyclerView
         setupListeners()
         presenter.loadMessages()
     }
