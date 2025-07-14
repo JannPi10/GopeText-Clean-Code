@@ -5,60 +5,81 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <ImageView
         android:id="@+id/img_Profile"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_margin="30dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_baseline_person_24"
-        app:layout_constraintBottom_toTopOf="@+id/btn_ChangePhoto"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.08" />
 
     <Button
         android:id="@+id/btn_ChangePhoto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="104dp"
+        android:layout_marginTop="48dp"
         android:backgroundTint="#8000D9"
         android:text="Cambiar Foto"
         android:textColor="@android:color/white"
-        app:layout_constraintBottom_toTopOf="@+id/edt_LastName"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.452"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/img_Profile"
+        app:layout_constraintVertical_bias="0.042" />
 
     <EditText
         android:id="@+id/edt_Name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="44dp"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/rounded_edittext"
         android:hint="Nombre"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/edt_LastName"
-        app:layout_constraintTop_toBottomOf="@+id/img_Profile"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.98" />
+
+    <EditText
+        android:id="@+id/edt_LastName"
+        android:layout_width="411dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="36dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="Apellido"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/edt_Age"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
         tools:layout_editor_absoluteX="0dp" />
 
     <EditText
-        android:id="@+id/edt_LastName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="248dp"
-        android:hint="Apellido"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:layout_editor_absoluteX="0dp" />
-
-    <EditText
         android:id="@+id/edt_Age"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:hint="Edad"
-        app:layout_constraintTop_toBottomOf="@+id/edt_LastName"
-        tools:layout_editor_absoluteX="16dp" />
+        android:layout_width="411dp"
+        android:layout_height="42dp"
+        android:layout_marginBottom="40dp"
+        android:background="@drawable/rounded_edittext"
+        android:hint="Apellido"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:textSize="15sp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_Save"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.986"
+        tools:layout_editor_absoluteX="0dp" />
 
     <Button
         android:id="@+id/btn_Save"
@@ -68,8 +89,8 @@
         android:text="GUARDAR"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edt_Age"
-        app:layout_constraintVertical_bias="0.908"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.86"
         tools:layout_editor_absoluteX="0dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

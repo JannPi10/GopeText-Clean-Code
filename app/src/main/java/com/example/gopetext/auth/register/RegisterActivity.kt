@@ -50,6 +50,12 @@ class RegisterActivity : AppCompatActivity(), RegisterContract.View {
                 return@setOnClickListener
             }
 
+            if (age > 120) {
+                showRegisterFail("Edad inválida. Ingrese una edad que sea valida.")
+                return@setOnClickListener
+            }
+
+
             if (password != confirm_password) {
                 showRegisterFail("Las contraseñas no coinciden.")
                 return@setOnClickListener

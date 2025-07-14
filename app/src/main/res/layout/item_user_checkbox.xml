@@ -24,6 +24,7 @@
         android:layout_height="wrap_content"
         android:text="Nombre del usuario"
         android:textSize="16sp"
+        android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@id/imgUser"
         app:layout_constraintEnd_toStartOf="@id/checkBoxUser"
         app:layout_constraintTop_toTopOf="@id/imgUser"

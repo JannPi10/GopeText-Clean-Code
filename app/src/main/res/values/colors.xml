@@ -12,5 +12,6 @@
     <color name="Gopecolor">#8000D9</color>
     <color name="primary_dark">#1a1c1b</color>
     <color name="input_color">#9c9a9a</color>
+    <color name="soft_gray">#5c5b5b</color>
 
 </resources>

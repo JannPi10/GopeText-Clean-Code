@@ -64,6 +64,18 @@ class EditProfileActivity : AppCompatActivity(), EditProfileContract.View {
             val lastName = etLastName.text.toString().trim()
             val age = etAge.text.toString().trim().toIntOrNull() ?: 0
 
+
+            if (age <= 0) {
+                showError("Edad inválida. Ingrese un número mayor que 0.")
+                return@setOnClickListener
+            }
+
+            if (age > 120) {
+                showError("Edad inválida. Ingrese una edad que sea valida.")
+                return@setOnClickListener
+            }
+
+
             val imagePart = selectedImageUri?.let { uri ->
                 Log.d("EditProfile", "Imagen seleccionada URI: $uri")
                 val file = FileUtil.from(this, uri)
