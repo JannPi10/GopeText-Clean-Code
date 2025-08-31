@@ -26,7 +26,7 @@ class ChatsListFragment : Fragment(), ChatsListContract.View {
         super.onCreate(savedInstanceState)
 
         // ✅ Inicializamos el presenter temprano para evitar crash
-        presenter = ChatsListPresenter(this, ApiClient.retrofit.create(ChatService::class.java))
+        presenter = ChatsListPresenter(this, ApiClient.createService<ChatService>())
     }
 
     override fun onCreateView(

@@ -49,7 +49,7 @@ class UsersPresenter(private val view: UsersContract.View) : UsersContract.Prese
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = ApiClient.retrofit.create(ChatService::class.java).createChat(CreateChatRequest(user.id))
+                val response = ApiClient.createService(ChatService::class.java).createChat(CreateChatRequest(user.id))
 
                 if (response.isSuccessful && response.body() != null) {
                     val chat = response.body()!!.id

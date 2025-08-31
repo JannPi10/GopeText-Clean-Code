@@ -2,109 +2,72 @@ package com.example.gopetext.auth.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Patterns
-import android.widget.Button
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.example.gopetext.R
+import androidx.core.widget.doAfterTextChanged
 import com.example.gopetext.auth.home.HomeActivity
+import com.example.gopetext.auth.login.validation.EmailValidator
+import com.example.gopetext.auth.login.validation.PasswordValidator
 import com.example.gopetext.auth.register.RegisterActivity
 import com.example.gopetext.data.api.ApiClient
+import com.example.gopetext.data.repository.RemoteAuthRepository
 import com.example.gopetext.data.storage.SessionManager
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.example.gopetext.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity(), LoginContract.View {
 
+    private lateinit var binding: ActivityLoginBinding
     private lateinit var presenter: LoginContract.Presenter
-    private lateinit var tilEmail: TextInputLayout
-    private lateinit var etEmail: TextInputEditText
-    private lateinit var tilPassword: TextInputLayout
-    private lateinit var etPassword: TextInputEditText
     private lateinit var sessionManager: SessionManager
+
+    private val emailValidator = EmailValidator()
+    private val passwordValidator = PasswordValidator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        enableEdgeToEdge()
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         ApiClient.init(applicationContext)
-
-
-        tilEmail = findViewById(R.id.tilEmail)
-        etEmail = findViewById(R.id.etEmail)
-        tilPassword = findViewById(R.id.tilPassword)
-        etPassword = findViewById(R.id.etPassword)
-        val btnIniciarSesion = findViewById<Button>(R.id.btnEnter)
-        val btnRegistrarse = findViewById<Button>(R.id.btnRegister)
-
         sessionManager = SessionManager(applicationContext)
-        presenter = LoginPresenter(this, ApiClient.getService(), sessionManager)
+        val repository = RemoteAuthRepository(ApiClient.getService())
+        presenter = LoginPresenter(this, repository, sessionManager)
 
         presenter.checkSession()
 
-        btnIniciarSesion.setOnClickListener {
-            if (validateFields()) {
-                val email = etEmail.text.toString().trim()
-                val password = etPassword.text.toString()
+        binding.btnEnter.setOnClickListener {
+            if (validateInputs()) {
+                val email = binding.etEmail.text?.toString()?.trim().orEmpty()
+                val password = binding.etPassword.text?.toString().orEmpty()
                 presenter.login(email, password)
             }
         }
 
-        btnRegistrarse.setOnClickListener {
+        binding.btnRegister.setOnClickListener {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
 
-        setupTextWatchers()
+        binding.etEmail.doAfterTextChanged { binding.tilEmail.error = null }
+        binding.etPassword.doAfterTextChanged { binding.tilPassword.error = null }
     }
 
-    private fun validateFields(): Boolean {
-        var valido = true
+    private fun validateInputs(): Boolean {
+        val emailText = binding.etEmail.text?.toString()?.trim().orEmpty()
+        val passwordText = binding.etPassword.text?.toString().orEmpty()
 
-        val email = etEmail.text.toString().trim()
-        val password = etPassword.text.toString()
+        val emailError = emailValidator.validate(emailText)
+        val passwordError = passwordValidator.validate(passwordText)
 
-        if (email.isEmpty()) {
-            tilEmail.error = "El correo es obligatorio"
-            valido = false
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            tilEmail.error = "Correo inválido"
-            valido = false
-        } else {
-            tilEmail.error = null
-        }
+        binding.tilEmail.error = emailError
+        binding.tilPassword.error = passwordError
 
-
-        if (password.isEmpty()) {
-            tilPassword.error = "La contraseña es obligatoria"
-            valido = false
-        } else {
-            tilPassword.error = null
-        }
-
-        return valido
-    }
-
-    private fun setupTextWatchers() {
-        etEmail.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                tilEmail.error = null
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
-
-        etPassword.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {
-                tilPassword.error = null
-            }
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-        })
+        return emailError == null && passwordError == null
     }
 
     override fun showLoginSuccess() {
-        Toast.makeText(this, "Login exitoso", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, HomeActivity::class.java))
         finish()
     }

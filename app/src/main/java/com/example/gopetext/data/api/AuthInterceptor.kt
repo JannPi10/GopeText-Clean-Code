@@ -1,32 +1,22 @@
 package com.example.gopetext.data.api
 
-import android.util.Log
 import com.example.gopetext.data.storage.SessionManager
 import okhttp3.Interceptor
 import okhttp3.Response
 
-
 class AuthInterceptor(private val sessionManager: SessionManager) : Interceptor {
-    override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
+    override fun intercept(chain: Interceptor.Chain): Response {
         val token = sessionManager.getAccessToken()
-        val originalRequest = chain.request()
-        val isMultipart = originalRequest.body?.contentType()?.subtype == "form-data"
+        val original = chain.request()
+        val isMultipart = original.body?.contentType()?.subtype == "form-data"
 
-        val requestBuilder = originalRequest.newBuilder()
-
-        if (!isMultipart) {
-            requestBuilder.addHeader("Content-Type", "application/json")
+        val builder = original.newBuilder()
+        if (!isMultipart && original.header("Content-Type").isNullOrEmpty()) {
+            builder.addHeader("Content-Type", "application/json")
         }
-
-        token?.let {
-            Log.d("AuthInterceptor", "Agregando token de autorización")
-            requestBuilder.addHeader("Authorization", "Bearer $it")
-        } ?: Log.w("AuthInterceptor", "Token no encontrado. Se enviará la solicitud sin Authorization.")
-
-        return chain.proceed(requestBuilder.build())
+        if (!token.isNullOrBlank()) {
+            builder.addHeader("Authorization", "Bearer $token")
+        }
+        return chain.proceed(builder.build())
     }
 }
-
-
-
-

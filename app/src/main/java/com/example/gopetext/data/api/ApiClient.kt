@@ -1,20 +1,19 @@
+// app/src/main/java/com/example/gopetext/data/api/ApiClient.kt
 package com.example.gopetext.data.api
 
 import android.content.Context
-import android.util.Log
-import com.example.gopetext.data.storage.SessionManager
-import com.example.gopetext.utils.Constants
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.gopetext.data.storage.SessionManager
+import com.example.gopetext.utils.Constants
 
 object ApiClient {
 
-    lateinit var retrofit: Retrofit
+    private lateinit var retrofit: Retrofit
 
     fun init(context: Context) {
         val sessionManager = SessionManager(context)
-
         val client = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(sessionManager))
             .build()
@@ -24,21 +23,17 @@ object ApiClient {
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
-
-        Log.d("ApiClient", "Retrofit inicializado con baseUrl: ${Constants.BASE_URL}")
     }
 
     fun getService(): AuthService {
-        if (!::retrofit.isInitialized) {
-            Log.e("ApiClient", "Error: ApiClient no inicializado antes de usar getService()")
-            throw IllegalStateException("ApiClient no ha sido inicializado.")
-        }
+        check(::retrofit.isInitialized) { "ApiClient not initialized. Call ApiClient.init(context) first." }
         return retrofit.create(AuthService::class.java)
     }
+
+    fun <T> createService(service: Class<T>): T {
+        check(::retrofit.isInitialized) { "ApiClient not initialized. Call ApiClient.init(context) first." }
+        return retrofit.create(service)
+    }
+
+    inline fun <reified T> createService(): T = createService(T::class.java)
 }
-
-
-
-
-
-

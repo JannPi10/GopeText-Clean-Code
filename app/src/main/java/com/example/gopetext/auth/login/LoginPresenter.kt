@@ -1,50 +1,41 @@
 package com.example.gopetext.auth.login
 
-import android.util.Log
-import com.example.gopetext.data.api.AuthService
-import com.example.gopetext.data.api.LoginRequest
+import com.example.gopetext.core.ApiResult
+import com.example.gopetext.data.repository.AuthRepository
 import com.example.gopetext.data.storage.SessionManager
-import com.example.gopetext.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.IOException
 
 class LoginPresenter(
     private val view: LoginContract.View,
-    private val api: AuthService,
+    private val repository: AuthRepository,
     private val sessionManager: SessionManager
 ) : LoginContract.Presenter {
 
-    override fun login(email: String, password: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = api.login(LoginRequest(email, password))
-                if (response.isSuccessful && response.body() != null) {
-                    val body = response.body()!!
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
+    override fun login(email: String, password: String) {
+        scope.launch {
+            when (val result = repository.login(email, password)) {
+                is ApiResult.Success -> {
+                    val body = result.data
                     sessionManager.saveAccessToken(body.token)
                     sessionManager.saveUserId(body.user_id)
-
-                    Log.d("LoginPresenter", "Guardado userId: ${body.user_id}")
-
-                    withContext(Dispatchers.Main) {
-                        view.showLoginSuccess()
-                    }
-                } else {
-                    val message = when (response.code()) {
-                        401 -> "Usuario o contraseña incorrectos"
-                        404 -> "Usuario no encontrado"
-                        else -> "Error desconocido (${response.code()})"
-                    }
-                    withContext(Dispatchers.Main) {
-                        view.showLoginError(message)
-                    }
+                    withContext(Dispatchers.Main) { view.showLoginSuccess() }
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    view.showLoginError("Error: ${e.localizedMessage}")
+                is ApiResult.HttpError -> {
+                    val message = when (result.code) {
+                        401 -> "Invalid credentials"
+                        404 -> "User not found"
+                        else -> "Server error (${result.code})"
+                    }
+                    withContext(Dispatchers.Main) { view.showLoginError(message) }
+                }
+                is ApiResult.NetworkError -> {
+                    withContext(Dispatchers.Main) { view.showLoginError(result.message) }
                 }
             }
         }
