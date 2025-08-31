@@ -18,7 +18,7 @@ class EditProfilePresenter(
 ) : EditProfileContract.Presenter {
 
     private val api: AuthService = ApiClient.getService()
-    private var currentUser: User? = null // Estado original del usuario
+    private var currentUser: User? = null
 
     override fun loadUserProfile() {
         CoroutineScope(Dispatchers.IO).launch {
@@ -26,7 +26,7 @@ class EditProfilePresenter(
                 val response = api.getUserProfile()
                 if (response.isSuccessful && response.body() != null) {
                     val user = response.body()!!.user
-                    currentUser = user // Guardamos para comparar después
+                    currentUser = user
 
                     withContext(Dispatchers.Main) {
                         view.showUserData(user)

@@ -58,7 +58,7 @@ class ProfileFragment : Fragment(), ProfileContract.View {
         presenter.loadUserData()
     }
 
-    override fun onResume() { // 👈 Para que cargue cada vez que regreses
+    override fun onResume() {
         super.onResume()
         presenter.loadUserData()
     }

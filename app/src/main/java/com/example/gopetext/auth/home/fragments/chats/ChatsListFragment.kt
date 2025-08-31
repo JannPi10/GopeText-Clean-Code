@@ -25,7 +25,6 @@ class ChatsListFragment : Fragment(), ChatsListContract.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ Inicializamos el presenter temprano para evitar crash
         presenter = ChatsListPresenter(this, ApiClient.createService<ChatService>())
     }
 
@@ -51,7 +50,6 @@ class ChatsListFragment : Fragment(), ChatsListContract.View {
 
         recyclerView.adapter = adapter
 
-        // 🔥 Escuchamos si se creó un grupo nuevo
         parentFragmentManager.setFragmentResultListener("group_created", viewLifecycleOwner) { _, _ ->
             Log.d("ChatsFragment", "Se ha creado un grupo nuevo, recargando chats")
             presenter.loadChats()
@@ -66,7 +64,7 @@ class ChatsListFragment : Fragment(), ChatsListContract.View {
 
     override fun showChats(chats: List<Contact>) {
         Log.d("ChatsFragment", "Mostrando ${chats.size} chats")
-        adapter.submitList(null) // workaround por si DiffUtil no actualiza bien
+        adapter.submitList(null)
         adapter.submitList(chats)
     }
 

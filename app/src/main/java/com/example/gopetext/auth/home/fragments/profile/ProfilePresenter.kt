@@ -48,7 +48,6 @@ class ProfilePresenter(
     override fun showUser(name: String, lastName: String, age: Int, photo: MultipartBody.Part?) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // Actualizar texto como JSON
                 val request = UpdateUserRequest(name, lastName, age)
                 val userResponse = api.updateUserProfile(request)
 
@@ -60,7 +59,6 @@ class ProfilePresenter(
                     }
                 }
 
-                // Actualizar imagen si existe
                 if (photo != null) {
                     val imageResponse = api.uploadProfileImage(photo)
 

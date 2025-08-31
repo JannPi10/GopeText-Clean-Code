@@ -23,7 +23,7 @@ class ChatSinglePresenter(
     private var isActive = true
     private val handler = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    private val chatService: ChatService = ApiClient.createService(ChatService::class.java)
+    private val chatService: ChatService = ApiClient.createService<ChatService>()
 
     override fun setChatId(chatId: Int) {
         this.chatId = chatId

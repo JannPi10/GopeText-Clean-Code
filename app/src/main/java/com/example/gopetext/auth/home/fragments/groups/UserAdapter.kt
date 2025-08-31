@@ -37,7 +37,6 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
         val user = users[position]
         holder.tvUserName.text = user.name
 
-        // Evitar múltiples disparos
         holder.checkBox.setOnCheckedChangeListener(null)
         holder.checkBox.isChecked = selectedUsers.contains(user)
 
@@ -51,7 +50,6 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
             }
         }
 
-        // Carga de imagen si tu modelo UserChat tiene URL
         val imageUrl = user.profile_image_url?.let {
             if (it.startsWith("http")) it else Constants.BASE_URL + it.removePrefix("/")
         }

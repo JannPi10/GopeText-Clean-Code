@@ -46,12 +46,10 @@ class ChatSingleActivity : AppCompatActivity(), ChatSingleContract.View {
 
         sessionManager = SessionManager(this)
 
-// Comprobación directa del valor guardado
         val sharedPrefs = getSharedPreferences("gopetext_prefs", MODE_PRIVATE)
         val directUserId = sharedPrefs.getInt("user_id", -1)
         Log.d("ChatActivity", "🔍 user_id directo desde prefs: $directUserId")
 
-// Intenta obtenerlo desde el SessionManager
         currentUserId = sessionManager.getUserId()
         Log.d("ChatActivity", "✅ currentUserId obtenido del SessionManager: $currentUserId")
 
@@ -69,8 +67,8 @@ class ChatSingleActivity : AppCompatActivity(), ChatSingleContract.View {
         presenter = ChatSinglePresenter(this)
         presenter.setChatId(chatId)
 
-        initViews()           // ✅ Inicializamos views antes de usarlas
-        setupRecyclerView()   // ✅ Ahora ya puedes usar recyclerView
+        initViews()
+        setupRecyclerView()
         setupListeners()
         presenter.loadMessages()
     }
