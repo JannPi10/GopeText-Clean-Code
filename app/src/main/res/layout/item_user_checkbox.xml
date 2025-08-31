@@ -22,7 +22,7 @@
         android:id="@+id/tvUserName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Nombre del usuario"
+        android:text="@string/placeholder_user_name"
         android:textSize="16sp"
         android:textColor="@color/black"
         app:layout_constraintStart_toEndOf="@id/imgUser"
@@ -30,7 +30,7 @@
         app:layout_constraintTop_toTopOf="@id/imgUser"
         app:layout_constraintBottom_toBottomOf="@id/imgUser"
         android:layout_marginStart="12dp"
-        tools:text="Carlos Daza" />
+        tools:text="Jann" />
 
     <CheckBox
         android:id="@+id/checkBoxUser"

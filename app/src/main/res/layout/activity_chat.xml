@@ -8,8 +8,6 @@
     android:background="@color/primary_dark"
     tools:context=".auth.home.users.chat.ChatSingleActivity">
 
-    <!-- Toolbar de fondo -->
-    <!-- Toolbar de fondo -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/myToolbar"
         android:layout_width="0dp"
@@ -21,7 +19,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Contenido encima del Toolbar -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/customToolbarContent"
         android:layout_width="0dp"
@@ -40,7 +37,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_back"
-            android:contentDescription="Volver"
+            android:contentDescription="@string/cd_back"
             app:tint="@color/white"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -54,7 +51,7 @@
             android:layout_marginEnd="12dp"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Nombre del Chat"
+            android:text="@string/chat_title"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold"
@@ -70,7 +67,7 @@
             android:layout_marginEnd="16dp"
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_exit"
-            android:contentDescription="Salir del grupo"
+            android:contentDescription="@string/cd_leave_group"
             app:tint="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -78,7 +75,6 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <!-- Fondo curvo debajo del toolbar -->
     <View
         android:id="@+id/viewBackground"
         android:layout_width="match_parent"
@@ -88,7 +84,6 @@
         app:layout_constraintTop_toBottomOf="@id/myToolbar"
         app:layout_constraintBottom_toTopOf="@+id/layoutSend" />
 
-    <!-- Lista de mensajes -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerview"
         android:layout_width="match_parent"
@@ -101,7 +96,6 @@
         app:layout_constraintTop_toBottomOf="@id/myToolbar"
         app:layout_constraintBottom_toBottomOf="@id/viewBackground" />
 
-    <!-- Input del mensaje -->
     <EditText
         android:id="@+id/inputMessage"
         android:layout_width="0dp"
@@ -110,7 +104,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="12dp"
         android:background="@drawable/background_chat_input"
-        android:hint="Escribe un mensaje"
+        android:hint="@string/hint_message"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
         android:inputType="text"
@@ -122,7 +116,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/layoutSend" />
 
-    <!-- Botón de enviar -->
     <FrameLayout
         android:id="@+id/layoutSend"
         android:layout_width="48dp"

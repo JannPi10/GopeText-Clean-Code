@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-
     <ImageView
         android:id="@+id/img_Profile"
         android:layout_width="120dp"
@@ -25,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:backgroundTint="#8000D9"
-        android:text="Cambiar Foto"
+        android:text="@string/btn_change_photo"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -40,7 +39,7 @@
         android:layout_height="42dp"
         android:layout_marginBottom="36dp"
         android:background="@drawable/rounded_edittext"
-        android:hint="Nombre"
+        android:hint="@string/hint_name"
         android:inputType="text"
         android:textAlignment="center"
         android:textSize="15sp"
@@ -57,14 +56,15 @@
         android:layout_height="42dp"
         android:layout_marginBottom="36dp"
         android:background="@drawable/rounded_edittext"
-        android:hint="Apellido"
+        android:hint="@string/hint_last_name"
         android:inputType="text"
         android:textAlignment="center"
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/edt_Age"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        tools:layout_editor_absoluteX="0dp" />
+        tools:layout_editor_absoluteX="0dp"
+        tools:ignore="MissingConstraints" />
 
     <EditText
         android:id="@+id/edt_Age"
@@ -72,21 +72,22 @@
         android:layout_height="42dp"
         android:layout_marginBottom="40dp"
         android:background="@drawable/rounded_edittext"
-        android:hint="Apellido"
+        android:hint="@string/hint_age"
         android:inputType="text"
         android:textAlignment="center"
         android:textSize="15sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_Save"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.986"
-        tools:layout_editor_absoluteX="0dp" />
+        tools:layout_editor_absoluteX="0dp"
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/btn_Save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:backgroundTint="#8000D9"
-        android:text="GUARDAR"
+        android:text="@string/btn_save"
         android:textColor="@android:color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
