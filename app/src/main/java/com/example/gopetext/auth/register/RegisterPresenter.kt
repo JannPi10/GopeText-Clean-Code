@@ -1,65 +1,43 @@
 package com.example.gopetext.auth.register
 
-import com.example.gopetext.data.api.*
-import com.example.gopetext.utils.Constants
-import com.example.gopetext.utils.ErrorUtils
-import kotlinx.coroutines.*
-import android.util.Log
+import com.example.gopetext.core.ApiResult
+import com.example.gopetext.data.repository.UserRegistrationRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class RegisterPresenter(private val view: RegisterContract.View) : RegisterContract.Presenter {
+class RegisterPresenter(
+    private val view: RegisterContract.View,
+    private val repository: UserRegistrationRepository
+) : RegisterContract.Presenter {
 
-    private val service = ApiClient.getService()
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun register(
-        name: String,
-        last_name: String,
+        firstName: String,
+        lastName: String,
         age: Int,
         email: String,
         password: String,
-        confirm_password: String
+        confirmPassword: String
     ) {
-        Log.d("RegisterPresenter", "Preparando registro...")
-        Log.d("RegisterPresenter", "Datos recibidos -> nombre: $name, apellido: $last_name, edad: $age, email: $email")
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val request = RegisterRequest(
-                    name = name,
-                    last_name = last_name,
-                    age = age,
-                    email = email,
-                    password = password,
-                    confirm_password = confirm_password
-                )
-                Log.d("RegisterPresenter", "Enviando solicitud al servidor: $request")
-
-                val response = service.register(request)
-
-                withContext(Dispatchers.Main) {
-                    Log.d("RegisterPresenter", "Respuesta recibida. Código: ${response.code()}")
-
-                    if (response.isSuccessful) {
-                        val message = response.body()?.message ?: Constants.DEFAULT_SUCCESS
-                        Log.d("RegisterPresenter", "Registro exitoso: $message")
-                        view.showMessage(message)
-                    } else {
-                        val errorJson = response.errorBody()?.string()
-                        val errorResponse = ErrorUtils.parseError(errorJson)
-
-                        if (errorResponse != null) {
-                            Log.e("RegisterPresenter", "Error del servidor: ${errorResponse.error.message}")
-                            view.showRegisterFail("Error: ${errorResponse.error.message}")
-                        } else {
-                            Log.e("RegisterPresenter", "No se pudo parsear error: $errorJson")
-                            view.showRegisterFail(Constants.UNKNOWN_ERROR)
-                        }
+        scope.launch {
+            when (val result = repository.registerUser(firstName, lastName, age, email, password, confirmPassword)) {
+                is ApiResult.Success -> {
+                    val message = result.data.message
+                    withContext(Dispatchers.Main) {
+                        view.showRegisterSuccess(message)
+                        view.navigateToLogin()
                     }
                 }
-
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    Log.e("RegisterPresenter", "Excepción capturada en registro", e)
-                    view.showRegisterFail("${Constants.NETWORK_ERROR}${e.localizedMessage}")
+                is ApiResult.HttpError -> {
+                    val message = result.message.ifBlank { "Server error (${result.code})" }
+                    withContext(Dispatchers.Main) { view.showRegisterError(message) }
+                }
+                is ApiResult.NetworkError -> {
+                    withContext(Dispatchers.Main) { view.showRegisterError(result.message) }
                 }
             }
         }

@@ -2,81 +2,105 @@ package com.example.gopetext.auth.register
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import com.example.gopetext.R
+import androidx.core.widget.doAfterTextChanged
 import com.example.gopetext.auth.login.LoginActivity
+import com.example.gopetext.auth.login.validation.EmailValidator
+import com.example.gopetext.auth.login.validation.PasswordValidator
+import com.example.gopetext.auth.register.validation.AgeRangeValidator
+import com.example.gopetext.auth.register.validation.NonEmptyTextValidator
+import com.example.gopetext.data.api.ApiClient
+import com.example.gopetext.data.repository.RemoteUserRegistrationRepository
+import com.example.gopetext.databinding.ActivityRegisterBinding
 
 class RegisterActivity : AppCompatActivity(), RegisterContract.View {
 
+    private lateinit var binding: ActivityRegisterBinding
     private lateinit var presenter: RegisterContract.Presenter
+
+    private val firstNameValidator = NonEmptyTextValidator(fieldLabel = "First name", minLength = 2)
+    private val lastNameValidator = NonEmptyTextValidator(fieldLabel = "Last name", minLength = 2)
+    private val ageValidator = AgeRangeValidator(min = 1, max = 120)
+    private val emailValidator = EmailValidator()
+    private val passwordValidator = PasswordValidator()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_register)
+        enableEdgeToEdge()
+        binding = ActivityRegisterBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // UI references
-        val etName = findViewById<EditText>(R.id.etName)
-        val etLastName = findViewById<EditText>(R.id.etLastName)
-        val etAge = findViewById<EditText>(R.id.etAge)
-        val etEmail = findViewById<EditText>(R.id.etEmailAddress)
-        val etPassword = findViewById<EditText>(R.id.etPassword)
-        val etConfirmPassword = findViewById<EditText>(R.id.etConfirmPassword)
-        val btnRegister = findViewById<Button>(R.id.btnRegister)
-        val btnBacktoLogin = findViewById<Button>(R.id.btnBackToLogin)
+        val repository = RemoteUserRegistrationRepository(ApiClient.getService())
+        presenter = RegisterPresenter(this, repository)
 
-        presenter = RegisterPresenter(this)
-
-        btnRegister.setOnClickListener {
-            val name = etName.text.toString().trim()
-            val last_name = etLastName.text.toString().trim()
-            val ageText = etAge.text.toString().trim()
-            val age = ageText.toIntOrNull() ?: -1
-            val email = etEmail.text.toString().trim()
-            val password = etPassword.text.toString()
-            val confirm_password = etConfirmPassword.text.toString()
-
-            // Validaciones
-            if (name.isEmpty() || last_name.isEmpty() || ageText.isEmpty() ||
-                email.isEmpty() || password.isEmpty() || confirm_password.isEmpty()) {
-                showRegisterFail("Por favor complete todos los campos.")
-                return@setOnClickListener
+        binding.btnRegister.setOnClickListener {
+            if (validateInputs()) {
+                val firstName = binding.etName.text?.toString()?.trim().orEmpty()
+                val lastName = binding.etLastName.text?.toString()?.trim().orEmpty()
+                val age = binding.etAge.text?.toString()?.trim().orEmpty().toInt()
+                val email = binding.etEmailAddress.text?.toString()?.trim().orEmpty()
+                val password = binding.etPassword.text?.toString().orEmpty()
+                val confirmPassword = binding.etConfirmPassword.text?.toString().orEmpty()
+                presenter.register(firstName, lastName, age, email, password, confirmPassword)
             }
-
-            if (age <= 0) {
-                showRegisterFail("Edad inválida. Ingrese un número mayor que 0.")
-                return@setOnClickListener
-            }
-
-            if (age > 120) {
-                showRegisterFail("Edad inválida. Ingrese una edad que sea valida.")
-                return@setOnClickListener
-            }
-
-
-            if (password != confirm_password) {
-                showRegisterFail("Las contraseñas no coinciden.")
-                return@setOnClickListener
-            }
-
-            presenter.register(name, last_name, age, email, password, confirm_password)
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
         }
 
-        btnBacktoLogin.setOnClickListener {
+        binding.btnBackToLogin.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
 
+        binding.etName.doAfterTextChanged { binding.etName.error = null }
+        binding.etLastName.doAfterTextChanged { binding.etLastName.error = null }
+        binding.etAge.doAfterTextChanged { binding.etAge.error = null }
+        binding.etEmailAddress.doAfterTextChanged { binding.etEmailAddress.error = null }
+        binding.etPassword.doAfterTextChanged { binding.etPassword.error = null }
+        binding.etConfirmPassword.doAfterTextChanged { binding.etConfirmPassword.error = null }
     }
 
-    override fun showMessage(message: String) {
+    private fun validateInputs(): Boolean {
+        val firstNameText = binding.etName.text?.toString()?.trim().orEmpty()
+        val lastNameText = binding.etLastName.text?.toString()?.trim().orEmpty()
+        val ageText = binding.etAge.text?.toString()?.trim().orEmpty()
+        val emailText = binding.etEmailAddress.text?.toString()?.trim().orEmpty()
+        val passwordText = binding.etPassword.text?.toString().orEmpty()
+        val confirmPasswordText = binding.etConfirmPassword.text?.toString().orEmpty()
+
+        val firstNameError = firstNameValidator.validate(firstNameText)
+        val lastNameError = lastNameValidator.validate(lastNameText)
+        val ageError = ageValidator.validate(ageText)
+        val emailError = emailValidator.validate(emailText)
+        val passwordError = passwordValidator.validate(passwordText)
+        val confirmPasswordError = if (confirmPasswordText != passwordText) "Contraseñas no coinciden" else null
+
+        binding.etName.error = firstNameError
+        binding.etLastName.error = lastNameError
+        binding.etAge.error = ageError
+        binding.etEmailAddress.error = emailError
+        binding.etPassword.error = passwordError
+        binding.etConfirmPassword.error = confirmPasswordError
+
+        return listOf(
+            firstNameError,
+            lastNameError,
+            ageError,
+            emailError,
+            passwordError,
+            confirmPasswordError
+        ).all { it == null }
+    }
+
+    override fun showRegisterSuccess(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-    override fun showRegisterFail(message: String) {
+    override fun showRegisterError(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun navigateToLogin() {
+        startActivity(Intent(this, LoginActivity::class.java))
+        finish()
     }
 }
