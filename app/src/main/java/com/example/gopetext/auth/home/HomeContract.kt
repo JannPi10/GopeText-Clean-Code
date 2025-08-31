@@ -7,7 +7,6 @@ interface HomeContract {
         fun showLogoutMessage(message: String)
         fun showError(message: String)
     }
-
     interface Presenter {
         fun logout()
         fun profile()

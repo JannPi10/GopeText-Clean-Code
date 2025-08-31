@@ -3,8 +3,9 @@ package com.example.gopetext.auth.home
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import com.example.gopetext.R
 import com.example.gopetext.auth.home.fragments.chats.ChatsListFragment
 import com.example.gopetext.auth.home.fragments.groups.CreateGroupFragment
@@ -12,69 +13,54 @@ import com.example.gopetext.auth.home.fragments.profile.ProfileFragment
 import com.example.gopetext.auth.home.users.UsersFragment
 import com.example.gopetext.auth.login.LoginActivity
 import com.example.gopetext.data.api.ApiClient
+import com.example.gopetext.data.repository.RemoteAccountRepository
 import com.example.gopetext.data.storage.SessionManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.gopetext.databinding.ActivityHomeBinding
 
 class HomeActivity : AppCompatActivity(), HomeContract.View {
 
+    private lateinit var binding: ActivityHomeBinding
     private lateinit var sessionManager: SessionManager
     private lateinit var presenter: HomeContract.Presenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        enableEdgeToEdge()
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         ApiClient.init(applicationContext)
 
-
-
-
         sessionManager = SessionManager(this)
-
         presenter = HomePresenter(
             this,
-            ApiClient.getService(),
+            RemoteAccountRepository(ApiClient.getService()),
             sessionManager
         )
 
-        val toolbar = findViewById<Toolbar>(R.id.myToolbar)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.myToolbar)
 
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
-
-        bottomNavigationView.setOnItemSelectedListener { item ->
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_chats -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, ChatsListFragment())
-                        .commit()
-                    true
-                }
-                R.id.nav_group -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, CreateGroupFragment())
-                        .commit()
-                    true
-                }
-                R.id.nav_users -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, UsersFragment())
-                        .commit()
-                    true
-                }
-                R.id.nav_profile -> {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, ProfileFragment())
-                        .commit()
-                    true
-                }
-                R.id.logout -> {
-                    presenter.logout()
-                    true
-                }
+                R.id.nav_chats -> replaceFragment(ChatsListFragment())
+                R.id.nav_group -> replaceFragment(CreateGroupFragment())
+                R.id.nav_users -> replaceFragment(UsersFragment())
+                R.id.nav_profile -> { presenter.profile(); true }
+                R.id.logout -> { presenter.logout(); true }
                 else -> false
             }
         }
 
+        if (savedInstanceState == null) {
+            binding.bottomNavigation.selectedItemId = R.id.nav_chats
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment): Boolean {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, fragment)
+            .commit()
+        return true
     }
 
     override fun navigateToLogin() {
@@ -83,10 +69,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
     }
 
     override fun navigateToProfile() {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, ProfileFragment())
-            .addToBackStack(null)
-            .commit()
+        replaceFragment(ProfileFragment())
     }
 
     override fun showLogoutMessage(message: String) {
