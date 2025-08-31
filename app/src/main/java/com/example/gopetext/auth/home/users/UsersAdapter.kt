@@ -14,7 +14,7 @@ class UsersAdapter(
     private val onClick: (UserChat) -> Unit
 ) : RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
 
-    inner class UserViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class UserViewHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: UserChat) {
             binding.tvUserName.text = user.name
 

@@ -5,7 +5,7 @@ data class Contact(
     val is_group: Boolean,
     val name: String,
     val profile_image_url: String?,
-    val user_id: Int?, // puede ser null en grupos
-    val members_count: Int? // solo si es grupo
+    val user_id: Int?,
+    val members_count: Int?
 )
 

@@ -14,7 +14,7 @@ interface ChatService {
     suspend fun getChats(): Response<ChatsResponse>
 
     @POST("api/chats")
-    suspend fun createChat(@Body request: CreateChatRequest): Response<Contact> // crea chat individual
+    suspend fun createChat(@Body request: CreateChatRequest): Response<Contact>
 
     @GET("api/chats/{id}/messages")
     suspend fun getMessages(@Path("id") chatId: Int): MessagesResponse
