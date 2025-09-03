@@ -1,115 +1,75 @@
 package com.example.gopetext.auth.home.edit
 
-import android.util.Log
-import com.example.gopetext.data.api.ApiClient
-import com.example.gopetext.data.api.AuthService
-import com.example.gopetext.data.api.UpdateUserRequest
 import com.example.gopetext.data.model.User
+import com.example.gopetext.data.repository.UserRepository
 import com.example.gopetext.data.storage.SessionManager
+import com.example.gopetext.utils.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MultipartBody
 
 class EditProfilePresenter(
     private val view: EditProfileContract.View,
-    private val sessionManager: SessionManager
+    sessionManager: SessionManager
 ) : EditProfileContract.Presenter {
 
-    private val api: AuthService = ApiClient.getService()
+    private val userRepository = UserRepository(sessionManager)
+    private val presenterJob = Job()
+    private val presenterScope = CoroutineScope(Dispatchers.Main + presenterJob)
     private var currentUser: User? = null
 
     override fun loadUserProfile() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = api.getUserProfile()
-                if (response.isSuccessful && response.body() != null) {
-                    val user = response.body()!!.user
-                    currentUser = user
-
-                    withContext(Dispatchers.Main) {
-                        view.showUserData(user)
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        view.showError("No se pudo cargar el perfil.")
-                    }
+        presenterScope.launch {
+            when (val result = withContext(Dispatchers.IO) {
+                userRepository.getUserProfile()
+            }) {
+                is Result.Success -> {
+                    currentUser = result.data.user
+                    view.showUserData(result.data.user)
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    view.showError("Error de red al cargar perfil.")
-                }
+                is Result.Error -> view.showError(result.message)
             }
         }
     }
 
     override fun updateUserProfile(name: String, lastName: String, age: Int, photo: MultipartBody.Part?) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val original = currentUser
-
-            val sinCambios = original != null &&
-                    original.name == name &&
-                    original.last_name == lastName &&
-                    original.age == age &&
-                    photo == null
-
-            if (sinCambios) {
-                withContext(Dispatchers.Main) {
-                    view.showSuccess("No se hicieron cambios.")
-                    view.goBackProfile()
-                }
+        presenterScope.launch {
+            if (hasNoChanges(name, lastName, age, photo)) {
+                view.showSuccess("No se hicieron cambios.")
+                view.goBackProfile()
                 return@launch
             }
 
-            try {
-                Log.d("EditProfile", "Actualizando perfil: $name $lastName ($age años)")
-
-                val request = UpdateUserRequest(name, lastName, age)
-                val updateResponse = api.updateUserProfile(request)
-                Log.d("EditProfile", "Respuesta updateUserProfile: ${updateResponse.code()} ${updateResponse.message()}")
-
-                withContext(Dispatchers.Main) {
-                    if (!updateResponse.isSuccessful) {
-                        view.showError("Error al actualizar datos.")
-                        return@withContext
-                    }
-                }
-
-                if (photo != null) {
-                    Log.d("EditProfile", "Subiendo imagen: ${photo.body.contentLength()} bytes")
-                    val photoResponse = api.uploadProfileImage(photo)
-                    Log.d("EditProfile", "Respuesta uploadProfileImage: ${photoResponse.code()} ${photoResponse.message()}")
-
-                    withContext(Dispatchers.Main) {
-                        if (!photoResponse.isSuccessful) {
-                            view.showError("Error al subir imagen.")
-                            return@withContext
-                        }
-                    }
-                } else {
-                    Log.d("EditProfile", "No se seleccionó imagen para subir.")
-                }
-
-                // Actualizar datos cacheados
-                if (original != null) {
-                    currentUser = original.copy(name = name, last_name = lastName, age = age)
-                }
-
-                withContext(Dispatchers.Main) {
+            when (val result = withContext(Dispatchers.IO) {
+                userRepository.updateUserProfile(name, lastName, age, photo)
+            }) {
+                is Result.Success -> {
+                    updateCurrentUser(name, lastName, age)
                     view.showSuccess("Perfil actualizado correctamente.")
                     view.goBackProfile()
                 }
-
-            } catch (e: Exception) {
-                Log.e("EditProfile", "Exception al actualizar perfil", e)
-                withContext(Dispatchers.Main) {
-                    view.showError("Error al actualizar: ${e.message}")
-                }
+                is Result.Error -> view.showError(result.message)
             }
         }
     }
+
+    private fun hasNoChanges(name: String, lastName: String, age: Int, photo: MultipartBody.Part?): Boolean {
+        val original = currentUser ?: return false
+        return original.name == name &&
+                original.last_name == lastName &&
+                original.age == age &&
+                photo == null
+    }
+
+    private fun updateCurrentUser(name: String, lastName: String, age: Int) {
+        currentUser = currentUser?.copy(name = name, last_name = lastName, age = age)
+    }
+
+    override fun onDestroy() {
+        presenterJob.cancel()
+    }
 }
-
-
 
