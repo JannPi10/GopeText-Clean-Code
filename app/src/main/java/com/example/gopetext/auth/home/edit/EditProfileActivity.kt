@@ -2,34 +2,24 @@ package com.example.gopetext.auth.home.edit
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
-import com.example.gopetext.R
-import com.example.gopetext.data.api.FileUtil
 import com.example.gopetext.data.model.User
 import com.example.gopetext.data.storage.SessionManager
-import com.example.gopetext.utils.Constants
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
+import com.example.gopetext.databinding.ActivityEditProfileBinding
+import com.example.gopetext.utils.ErrorHandler
+import com.example.gopetext.utils.ImageLoader
+import com.example.gopetext.utils.validators.ProfileValidator
+import com.example.gopetext.utils.factories.ImagePartFactory
 
 class EditProfileActivity : AppCompatActivity(), EditProfileContract.View {
 
+    private lateinit var binding: ActivityEditProfileBinding
     private lateinit var presenter: EditProfileContract.Presenter
     private lateinit var sessionManager: SessionManager
-
-    private lateinit var etName: EditText
-    private lateinit var etLastName: EditText
-    private lateinit var etAge: EditText
-    private lateinit var btnSave: Button
-    private lateinit var ivProfileImage: ImageView
-    private lateinit var btnSelectImage: Button
+    private lateinit var imageLoader: ImageLoader
+    private lateinit var errorHandler: ErrorHandler
+    private lateinit var profileValidator: ProfileValidator
 
     private var selectedImageUri: Uri? = null
 
@@ -37,92 +27,82 @@ class EditProfileActivity : AppCompatActivity(), EditProfileContract.View {
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             uri?.let {
                 selectedImageUri = it
-                ivProfileImage.setImageURI(it)
+                binding.imgProfile.setImageURI(it)
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_edit_profile)
+        binding = ActivityEditProfileBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        sessionManager = SessionManager(this)
-        presenter = EditProfilePresenter(this, sessionManager)
-
-        etName = findViewById(R.id.edt_Name)
-        etLastName = findViewById(R.id.edt_LastName)
-        etAge = findViewById(R.id.edt_Age)
-        btnSave = findViewById(R.id.btn_Save)
-        ivProfileImage = findViewById(R.id.img_Profile)
-        btnSelectImage = findViewById(R.id.btn_ChangePhoto)
-
-        btnSelectImage.setOnClickListener {
-            imagePickerLauncher.launch("image/*")
-        }
-
-        btnSave.setOnClickListener {
-            val name = etName.text.toString().trim()
-            val lastName = etLastName.text.toString().trim()
-            val age = etAge.text.toString().trim().toIntOrNull() ?: 0
-
-
-            if (age <= 0) {
-                showError("Edad inválida. Ingrese un número mayor que 0.")
-                return@setOnClickListener
-            }
-
-            if (age > 120) {
-                showError("Edad inválida. Ingrese una edad que sea valida.")
-                return@setOnClickListener
-            }
-
-
-            val imagePart = selectedImageUri?.let { uri ->
-                Log.d("EditProfile", "Imagen seleccionada URI: $uri")
-                val file = FileUtil.from(this, uri)
-                Log.d("EditProfile", "Imagen convertida a File: ${file.name}, size=${file.length()}")
-                val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-                MultipartBody.Part.createFormData("image", file.name, requestFile)
-            }
-
-            presenter.updateUserProfile(name, lastName, age, imagePart)
-        }
-
+        initDependencies()
+        setupViews()
         presenter.loadUserProfile()
     }
 
-    override fun showUserData(user: User) {
-        etName.setText(user.name)
-        etLastName.setText(user.last_name)
-        etAge.setText(user.age.toString())
+    private fun initDependencies() {
+        sessionManager = SessionManager(this)
+        imageLoader = ImageLoader(this)
+        errorHandler = ErrorHandler(this)
+        profileValidator = ProfileValidator()
+        presenter = EditProfilePresenter(this, sessionManager)
+    }
 
-        val imageUrl = user.profile_image_url?.let {
-            if (it.startsWith("http")) it else Constants.BASE_URL + it.removePrefix("/")
+    private fun setupViews() {
+        binding.btnChangePhoto.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
         }
 
-        if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(this)
-                .load(imageUrl)
-                .placeholder(R.drawable.ic_baseline_person_24)
-                .circleCrop()
-                .into(ivProfileImage)
-        } else {
-            ivProfileImage.setImageResource(R.drawable.ic_baseline_person_24)
+        binding.btnSave.setOnClickListener {
+            handleSaveProfile()
         }
     }
 
+    private fun handleSaveProfile() {
+        val name = binding.edtName.text.toString().trim()
+        val lastName = binding.edtLastName.text.toString().trim()
+        val ageText = binding.edtAge.text.toString().trim()
+
+        val validationResult = profileValidator.validateProfileData(name, lastName, ageText)
+
+        if (!validationResult.isValid) {
+            showError(validationResult.errorMessage)
+            return
+        }
+
+        val age = ageText.toInt()
+        val imagePart = ImagePartFactory.createImagePart(this, selectedImageUri)
+
+        presenter.updateUserProfile(name, lastName, age, imagePart)
+    }
+
+    override fun showUserData(user: User) {
+        binding.edtName.setText(user.name)
+        binding.edtLastName.setText(user.last_name)
+        binding.edtAge.setText(user.age.toString())
+
+        imageLoader.loadProfileImage(user.profile_image_url, binding.imgProfile)
+    }
+
     override fun showSuccess(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        errorHandler.showSuccess(message)
         finish()
     }
 
     override fun showError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        errorHandler.showError(message)
     }
 
     override fun goBackProfile() {
         finish()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (::presenter.isInitialized) {
+            presenter.onDestroy()
+        }
+    }
 }
-
-
 
