@@ -1,6 +1,5 @@
 package com.example.gopetext.auth.home.fragments.chats
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,10 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.example.gopetext.R
 import com.example.gopetext.data.model.Contact
-import com.example.gopetext.utils.Constants
+import com.example.gopetext.utils.UrlUtils.imageUrlBuilder
+import com.example.gopetext.utils.loadImage
 
 class ChatsListAdapter(
     private val onItemClick: (Contact) -> Unit
@@ -30,26 +29,23 @@ class ChatsListAdapter(
 
     override fun onBindViewHolder(holder: ChatViewHolder, position: Int) {
         val contact = getItem(position)
-        Log.d("ChatsAdapter", "Mostrando chat: ${contact.name}")
 
+        bindName(holder, contact)
+        bindImage(holder, contact)
+        bindClick(holder, contact)
+    }
+
+    private fun bindName(holder: ChatViewHolder, contact: Contact) {
         holder.name.text = contact.name
+    }
 
-        val imageUrl = contact.profile_image_url?.let {
-            if (it.startsWith("http")) it else Constants.BASE_URL + it.removePrefix("/")
-        }
+    private fun bindImage(holder: ChatViewHolder, contact: Contact) {
+        val imageUrl = imageUrlBuilder(contact.profile_image_url)
+        holder.image.loadImage(imageUrl)
+    }
 
-        if (!imageUrl.isNullOrEmpty()) {
-            Glide.with(holder.itemView.context)
-                .load(imageUrl)
-                .placeholder(R.drawable.ic_baseline_person_24)
-                .into(holder.image)
-        } else {
-            holder.image.setImageResource(R.drawable.ic_baseline_person_24)
-        }
-
-        holder.itemView.setOnClickListener {
-            onItemClick(contact)
-        }
+    private fun bindClick(holder: ChatViewHolder, contact: Contact) {
+        holder.itemView.setOnClickListener { onItemClick(contact) }
     }
 
     class DiffCallback : DiffUtil.ItemCallback<Contact>() {
@@ -57,5 +53,4 @@ class ChatsListAdapter(
         override fun areContentsTheSame(oldItem: Contact, newItem: Contact) = oldItem == newItem
     }
 }
-
 
