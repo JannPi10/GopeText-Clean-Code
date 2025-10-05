@@ -1,44 +1,39 @@
 package com.example.gopetext.auth.home.fragments.groups
 
-import android.util.Log
-import com.example.gopetext.data.api.ApiClient
-import com.example.gopetext.data.api.CreateGroupRequest
+import com.example.gopetext.core.ApiResult
 import com.example.gopetext.data.model.UserChat
+import com.example.gopetext.data.repository.GroupRepository
+import com.example.gopetext.data.repository.UsersRepository
+import com.example.gopetext.data.storage.SessionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CreateGroupPresenter(
-    private val view: CreateGroupContract.View
+    private val view: CreateGroupContract.View,
+    private val usersRepository: UsersRepository,
+    private val groupRepository: GroupRepository,
+    private val sessionManager: SessionManager
 ) : CreateGroupContract.Presenter {
 
-    private val api = ApiClient.getService()
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    override fun loadUsers(currentUserId: Int) {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = api.getAllUsers()
-                if (response.isSuccessful) {
-                    val allUsers = response.body()?.users ?: emptyList()
-                    val filtered = allUsers.filter { it.id != currentUserId }
-
-                    Log.d("CreateGroup", "Usuarios recibidos: ${allUsers.size}")
-                    Log.d("CreateGroup", "Usuarios después de filtrar actual: ${filtered.size}")
-
-                    withContext(Dispatchers.Main) {
-                        view.showUsers(filtered)
-                    }
-                } else {
-                    Log.e("CreateGroup", "Fallo al obtener usuarios: ${response.code()}")
-                    withContext(Dispatchers.Main) {
-                        view.showError("No se pudieron cargar los usuarios")
-                    }
+    override fun loadUsers() {
+        scope.launch {
+            when (val result = usersRepository.getAllUsersForChat()) {
+                is ApiResult.Success -> {
+                    val currentUserId = sessionManager.getUserId()
+                    val filteredUsers = result.data.filter { it.id != currentUserId }
+                    withContext(Dispatchers.Main) { view.showUsers(filteredUsers) }
                 }
-            } catch (e: Exception) {
-                Log.e("CreateGroup", "Error al obtener usuarios: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    view.showError("Error de red: ${e.message}")
+                is ApiResult.HttpError -> withContext(Dispatchers.Main) {
+                    view.showError("Unable to load users")
+                }
+                is ApiResult.NetworkError -> withContext(Dispatchers.Main) {
+                    view.showError(result.message)
                 }
             }
         }
@@ -46,44 +41,34 @@ class CreateGroupPresenter(
 
     override fun createGroup(name: String, selectedUsers: List<UserChat>) {
         if (name.isBlank()) {
-            view.showError("Ingresa un nombre para el grupo")
+            view.showError("Enter a group name")
             return
         }
 
         if (selectedUsers.isEmpty()) {
-            view.showError("Selecciona al menos una persona")
+            view.showError("Select at least one person")
             return
         }
 
         val userIds = selectedUsers.map { it.id }
-        val request = CreateGroupRequest(name = name, members = userIds)
 
-        Log.d("CreateGroup", "Intentando crear grupo con: $request")
-
-        Log.d("CreateGroupRequest", "Payload: name=${request.name}, members=${request.members}")
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val response = api.createGroup(request)
-                if (response.isSuccessful) {
-                    Log.d("CreateGroup", "Grupo creado con éxito")
-                    withContext(Dispatchers.Main) {
-                        view.showSuccess("Grupo creado correctamente")
-                    }
-                } else {
-                    Log.e("CreateGroup", "Error HTTP al crear grupo: ${response.code()}")
-                    withContext(Dispatchers.Main) {
-                        view.showError("No se pudo crear el grupo (código: ${response.code()})")
-                    }
+        scope.launch {
+            when (val result = groupRepository.createGroup(name, userIds)) {
+                is ApiResult.Success -> withContext(Dispatchers.Main) {
+                    view.showSuccess("Group created successfully")
+                    view.navigateBack()
                 }
-            } catch (e: Exception) {
-                Log.e("CreateGroup", "Excepción al crear grupo: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    view.showError("Error de red: ${e.message}")
+                is ApiResult.HttpError -> withContext(Dispatchers.Main) {
+                    view.showError("Unable to create group")
+                }
+                is ApiResult.NetworkError -> withContext(Dispatchers.Main) {
+                    view.showError(result.message)
                 }
             }
         }
     }
+
+    override fun onDestroy() {
+        scope.cancel()
+    }
 }
-
-

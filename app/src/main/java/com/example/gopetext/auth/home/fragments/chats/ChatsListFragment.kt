@@ -22,7 +22,6 @@ class ChatsListFragment : Fragment(), ChatsListContract.View {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // ✅ Dependencias inyectadas mediante interfaces
         presenter = ChatsListPresenter(this, ApiClient.createService<ChatService>())
         navigator = DefaultChatsNavigator(requireContext())
     }
@@ -45,7 +44,7 @@ class ChatsListFragment : Fragment(), ChatsListContract.View {
     }
 
     override fun showChats(chats: List<Contact>) {
-        adapter.submitList(chats.toList()) // Crear copia para evitar problemas de diff
+        adapter.submitList(chats.toList())
     }
 
     override fun showError(message: String) {
