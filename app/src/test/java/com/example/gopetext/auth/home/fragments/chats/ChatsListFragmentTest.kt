@@ -12,7 +12,6 @@ class ChatsListFragmentTest {
     private lateinit var fragment: ChatsListContract.View
     private lateinit var navigator: ChatsNavigator
     private lateinit var adapter: ChatsListAdapter
-    private lateinit var context: Context
 
     @Before
     fun setup() {
