@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gopetext.data.model.User
+import com.example.gopetext.data.repository.UserRepository
 import com.example.gopetext.data.storage.SessionManager
 import com.example.gopetext.databinding.ActivityEditProfileBinding
 import com.example.gopetext.utils.ErrorHandler
@@ -43,10 +44,8 @@ class EditProfileActivity : AppCompatActivity(), EditProfileContract.View {
 
     private fun initDependencies() {
         sessionManager = SessionManager(this)
-        imageLoader = ImageLoader(this)
-        errorHandler = ErrorHandler(this)
-        profileValidator = ProfileValidator()
-        presenter = EditProfilePresenter(this, sessionManager)
+        val userRepository = UserRepository(sessionManager)
+        presenter = EditProfilePresenter(this, userRepository)
     }
 
     private fun setupViews() {

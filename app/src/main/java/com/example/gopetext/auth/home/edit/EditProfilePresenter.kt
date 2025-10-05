@@ -2,30 +2,24 @@ package com.example.gopetext.auth.home.edit
 
 import com.example.gopetext.data.model.User
 import com.example.gopetext.data.repository.UserRepository
-import com.example.gopetext.data.storage.SessionManager
 import com.example.gopetext.utils.Result
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.MultipartBody
 
 class EditProfilePresenter(
     private val view: EditProfileContract.View,
-    sessionManager: SessionManager
+    private val userRepository: UserRepository,
+    mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : EditProfileContract.Presenter {
 
-    private val userRepository = UserRepository(sessionManager)
-    private val presenterJob = Job()
-    private val presenterScope = CoroutineScope(Dispatchers.Main + presenterJob)
-    private var currentUser: User? = null
+    private val presenterJob = SupervisorJob()
+    private val presenterScope = CoroutineScope(mainDispatcher + presenterJob)
+    var currentUser: User? = null
 
     override fun loadUserProfile() {
         presenterScope.launch {
-            when (val result = withContext(Dispatchers.IO) {
-                userRepository.getUserProfile()
-            }) {
+            when (val result = withContext(ioDispatcher) { userRepository.getUserProfile() }) {
                 is Result.Success -> {
                     currentUser = result.data.user
                     view.showUserData(result.data.user)
@@ -43,7 +37,7 @@ class EditProfilePresenter(
                 return@launch
             }
 
-            when (val result = withContext(Dispatchers.IO) {
+            when (val result = withContext(ioDispatcher) {
                 userRepository.updateUserProfile(name, lastName, age, photo)
             }) {
                 is Result.Success -> {

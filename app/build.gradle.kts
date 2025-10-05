@@ -45,10 +45,10 @@ android {
 }
 
 dependencies {
-    // ConstraintLayout en Compose
+    // ConstraintLayout
     implementation(libs.androidx.constraintlayout)
 
-    // Dependencias estándar de Compose
+    // Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -61,7 +61,20 @@ dependencies {
     implementation(libs.androidx.leanback)
     implementation(libs.material)
 
-    // Test
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.logging.interceptor)
+
+    // Glide
+    implementation(libs.glide)
+    kapt(libs.compiler)
+    implementation(libs.glide.v4151)
+
+    // RoundedImageView
+    implementation(libs.roundedimageview)
+
+    // TESTS
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -70,19 +83,14 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
-    implementation(libs.logging.interceptor)
+    // Mockito
+    testImplementation(libs.mockito.kotlin)
 
-    //Glide
-    implementation(libs.glide)
-    kapt(libs.compiler)
+    testImplementation(libs.kotlinx.coroutines.test.v173)
 
-    //RoundedImageView
-    implementation(libs.roundedimageview)
+    // Core testing
+    testImplementation(libs.androidx.core.testing)
 
-    //Glide
-    implementation(libs.glide.v4151)
-    //annotationProcessor(libs.compiler.v4151)
+    // Kotlin test
+    testImplementation(kotlin("test"))
 }
