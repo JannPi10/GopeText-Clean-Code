@@ -12,6 +12,7 @@ class ChatsListFragmentTest {
     private lateinit var fragment: ChatsListContract.View
     private lateinit var navigator: ChatsNavigator
     private lateinit var adapter: ChatsListAdapter
+    private lateinit var context: Context
 
     @Before
     fun setup() {
@@ -20,14 +21,12 @@ class ChatsListFragmentTest {
         adapter = mock()
         context = mock()
 
-        // Creamos una implementación mínima del View (simulamos el fragmento)
         fragment = object : ChatsListContract.View {
             override fun showChats(chats: List<Contact>) {
                 adapter.submitList(chats)
             }
 
             override fun showError(message: String) {
-                // En tests unitarios no mostramos toasts, solo verificamos que no falle
                 println("Error mostrado: $message")
             }
 
@@ -75,7 +74,6 @@ class ChatsListFragmentTest {
 
     @Test
     fun `presenter should load chats when fragment resumes`() {
-        // simulamos un evento de onResume
         presenter.loadChats()
         verify(presenter).loadChats()
     }
