@@ -235,3 +235,10 @@ They return `String?` (error message or null if valid).
 - Revoke token on server at logout if applicable.
 
 ---
+
+## Unit test coverage
+
+- Unit tests were performed on some classes of the project, thus covering 66% of the current version, with around 109 tests passed out of 133 tests. <img width="800" height="233" alt="image" src="https://github.com/user-attachments/assets/346008dd-8bb9-448e-9862-402544354aa3" />
+
+
+---

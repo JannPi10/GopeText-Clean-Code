@@ -1,31 +1,29 @@
 package com.example.gopetext.auth.home.fragments.chats
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.view.View
-import android.widget.Toast
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gopetext.R
-import com.example.gopetext.auth.home.users.chat.ChatSingleActivity
 import com.example.gopetext.data.api.ApiClient
 import com.example.gopetext.data.api.ChatService
 import com.example.gopetext.data.model.Contact
+import com.example.gopetext.utils.toast
 
 class ChatsListFragment : Fragment(), ChatsListContract.View {
 
     private lateinit var presenter: ChatsListContract.Presenter
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ChatsListAdapter
+    private lateinit var navigator: ChatsNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         presenter = ChatsListPresenter(this, ApiClient.createService<ChatService>())
+        navigator = DefaultChatsNavigator(requireContext())
     }
 
     override fun onCreateView(
@@ -36,45 +34,39 @@ class ChatsListFragment : Fragment(), ChatsListContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        recyclerView = view.findViewById(R.id.recyclerChats)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        adapter = ChatsListAdapter { contact ->
-            val intent = Intent(requireContext(), ChatSingleActivity::class.java)
-            intent.putExtra("chatId", contact.id)
-            intent.putExtra("chatName", contact.name)
-            intent.putExtra("isGroup", contact.is_group)
-            requireContext().startActivity(intent)
-        }
-
-        recyclerView.adapter = adapter
-
-        parentFragmentManager.setFragmentResultListener("group_created", viewLifecycleOwner) { _, _ ->
-            Log.d("ChatsFragment", "Se ha creado un grupo nuevo, recargando chats")
-            presenter.loadChats()
-        }
+        setupRecyclerView(view)
+        setupFragmentListeners()
     }
 
     override fun onResume() {
         super.onResume()
-        Log.d("ChatsFragment", "Volviendo a cargar los chats")
         presenter.loadChats()
     }
 
     override fun showChats(chats: List<Contact>) {
-        Log.d("ChatsFragment", "Mostrando ${chats.size} chats")
-        adapter.submitList(null)
-        adapter.submitList(chats)
+        adapter.submitList(chats.toList())
     }
 
     override fun showError(message: String) {
-        Log.e("ChatsFragment", "Error: $message")
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        requireContext().toast(message)
     }
 
     override fun showEmptyState() {
-        Log.d("ChatsFragment", "No hay chats para mostrar")
-        Toast.makeText(requireContext(), "No tienes chats aún", Toast.LENGTH_SHORT).show()
+        requireContext().toast("No tienes chats aún")
+    }
+
+    private fun setupRecyclerView(view: View) {
+        recyclerView = view.findViewById(R.id.recyclerChats)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter = ChatsListAdapter { contact ->
+            navigator.navigateToChat(contact)
+        }
+        recyclerView.adapter = adapter
+    }
+
+    private fun setupFragmentListeners() {
+        parentFragmentManager.setFragmentResultListener("group_created", viewLifecycleOwner) { _, _ ->
+            presenter.loadChats()
+        }
     }
 }

@@ -7,10 +7,12 @@ interface CreateGroupContract {
         fun showUsers(users: List<UserChat>)
         fun showSuccess(message: String)
         fun showError(message: String)
+        fun navigateBack()
     }
 
     interface Presenter {
-        fun loadUsers(currentUserId: Int)
+        fun loadUsers()
         fun createGroup(name: String, selectedUsers: List<UserChat>)
+        fun onDestroy()
     }
 }

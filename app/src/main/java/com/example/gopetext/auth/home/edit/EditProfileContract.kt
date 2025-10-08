@@ -14,6 +14,7 @@ interface EditProfileContract {
     interface Presenter {
         fun loadUserProfile()
         fun updateUserProfile(name: String, lastName: String, age: Int, photo: MultipartBody.Part?)
+        fun onDestroy()
     }
 }
 

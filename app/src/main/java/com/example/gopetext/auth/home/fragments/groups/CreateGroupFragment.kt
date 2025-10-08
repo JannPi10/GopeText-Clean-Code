@@ -1,72 +1,69 @@
 package com.example.gopetext.auth.home.fragments.groups
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.gopetext.R
-import com.example.gopetext.auth.home.fragments.chats.ChatsListFragment
+import com.example.gopetext.data.api.ApiClient
 import com.example.gopetext.data.model.UserChat
+import com.example.gopetext.data.repository.RemoteGroupRepository
+import com.example.gopetext.data.repository.RemoteUsersRepository
 import com.example.gopetext.data.storage.SessionManager
+import com.example.gopetext.databinding.FragmentCreateGroupBinding
 
 class CreateGroupFragment : Fragment(), CreateGroupContract.View {
 
+    private lateinit var binding: FragmentCreateGroupBinding
     private lateinit var presenter: CreateGroupContract.Presenter
-    private lateinit var sessionManager: SessionManager
-    private lateinit var userAdapter: UserAdapter
+    private lateinit var adapter: UserAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_create_group, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentCreateGroupBinding.inflate(inflater, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        val sessionManager = SessionManager(requireContext())
+        presenter = CreateGroupPresenter(
+            this,
+            RemoteUsersRepository(ApiClient.getService()),
+            RemoteGroupRepository(ApiClient.getService()),
+            sessionManager
+        )
 
-        sessionManager = SessionManager(requireContext())
-        presenter = CreateGroupPresenter(this)
+        adapter = UserAdapter(emptyList())
+        binding.rvUsers.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvUsers.adapter = adapter
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.rvUsers)
-        val btnCreate = view.findViewById<Button>(R.id.btnCreateGroup)
-        val etGroupName = view.findViewById<EditText>(R.id.etGroupName)
-
-        userAdapter = UserAdapter()
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        recyclerView.adapter = userAdapter
-
-        val currentUserId = sessionManager.getUserId()
-        presenter.loadUsers(currentUserId)
-
-        btnCreate.setOnClickListener {
-            val selectedUsers = userAdapter.getSelectedUsers()
-            Log.d("CreateGroupFragment", "Usuarios seleccionados para grupo: ${selectedUsers.map { it.name }}")
-            val groupName = etGroupName.text.toString().trim()
+        binding.btnCreateGroup.setOnClickListener {
+            val groupName = binding.etGroupName.text.toString().trim()
+            val selectedUsers = adapter.getSelectedUsers()
             presenter.createGroup(groupName, selectedUsers)
         }
+
+        presenter.loadUsers()
+        return binding.root
     }
 
     override fun showUsers(users: List<UserChat>) {
-        Log.d("CreateGroupFragment", "Mostrando ${users.size} usuarios en RecyclerView")
-        userAdapter.setUsers(users)
+        adapter.setUsers(users)
     }
 
     override fun showSuccess(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-
-        parentFragmentManager.setFragmentResult("group_created", Bundle())
-
-        parentFragmentManager.popBackStack()
     }
 
     override fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
-}
 
+    override fun navigateBack() {
+        parentFragmentManager.setFragmentResult("group_created", Bundle())
+        parentFragmentManager.popBackStack()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        presenter.onDestroy()
+    }
+}
