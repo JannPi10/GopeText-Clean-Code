@@ -9,6 +9,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +41,7 @@ class ChatsListPresenterTest {
     }
 
     @Test
-    fun `loadChats success with contacts shows chats`() = runTest {
+    fun loadChatsSuccessWithContactsShowsChats() = runTest {
         val contacts = listOf(
             Contact(1, false, "John Doe", null, 1, null),
             Contact(2, true, "Jane Smith", null, null, 5)
@@ -54,7 +56,7 @@ class ChatsListPresenterTest {
     }
 
     @Test
-    fun `loadChats success with empty list shows empty state`() = runTest {
+    fun loadChatsSuccessWithEmptyListShowsEmptyState() = runTest {
         val response = ChatsResponse(emptyList())
 
         whenever(chatService.getChats()).thenReturn(Response.success(response))
@@ -65,20 +67,21 @@ class ChatsListPresenterTest {
     }
 
     @Test
-    fun `loadChats http error shows error message`() = runTest {
-        whenever(chatService.getChats()).thenReturn(Response.error(500, mock()))
+    fun loadChatsHttpErrorShowsErrorMessage() = runTest {
+        val errorBody = "Internal Server Error".toResponseBody("application/json".toMediaType())
+        whenever(chatService.getChats()).thenReturn(Response.error(500, errorBody))
 
         presenter.loadChats()
 
-        verify(view).showError("Error al cargar chats")
+        verify(view).showError("Error 500: Response.error()")
     }
 
     @Test
-    fun `loadChats network error shows error message`() = runTest {
+    fun loadChatsNetworkErrorShowsErrorMessage() = runTest {
         whenever(chatService.getChats()).thenThrow(RuntimeException("Network error"))
 
         presenter.loadChats()
 
-        verify(view).showError("Error de red")
+        verify(view).showError("Error al obtener los chats: Network error")
     }
 }
