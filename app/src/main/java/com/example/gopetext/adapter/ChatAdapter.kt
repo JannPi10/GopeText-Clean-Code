@@ -15,6 +15,7 @@ class ChatAdapter(private val currentUserId: Int) : RecyclerView.Adapter<Recycle
 
     private val messages: MutableList<Message> = mutableListOf()
 
+
     companion object {
         private const val VIEW_TYPE_SENT = 1
         private const val VIEW_TYPE_RECEIVED = 2
