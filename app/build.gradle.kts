@@ -86,7 +86,10 @@ dependencies {
     // Mockito
     testImplementation(libs.mockito.kotlin)
 
-    testImplementation(libs.kotlinx.coroutines.test.v173)
+    // Coroutines
+    implementation(libs.kotlinxCoroutinesCore)
+    implementation(libs.kotlinxCoroutinesAndroid)
+    testImplementation(libs.kotlinxCoroutinesTest)
 
     // Core testing
     testImplementation(libs.androidx.core.testing)
