@@ -44,7 +44,9 @@ class ChatAdapter(private val currentUserId: Int) : RecyclerView.Adapter<Recycle
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
         val isSent = message.sender == currentUserId
-        Log.d("ChatAdapter", "Pos: $position | sender: ${message.sender}, currentUserId: $currentUserId, es mío? $isSent")
+        Log.d("ChatAdapter", "Pos: $position | sender: ${message.sender} (${message.sender.javaClass.name}), currentUserId: $currentUserId (${currentUserId.javaClass.name}), es mío? $isSent")
+        Log.d("ChatAdapter", "Mensaje: ${message.content}")
+        Log.d("ChatAdapter", "Todos los mensajes: ${messages.map { "${it.sender}:${it.content}" }}")
         return if (isSent) VIEW_TYPE_SENT else VIEW_TYPE_RECEIVED
     }
 

@@ -2,7 +2,8 @@ package com.example.gopetext.utils
 
 object Constants{
 
-    const val BASE_URL = "http://159.203.187.94/"
+    // URL de producción del backend
+    const val BASE_URL = "http://android-backend.motcha.shop/"
 
     const val DEFAULT_SUCCESS = "Registro exitoso"
     const val UNKNOWN_ERROR = "Error desconocido del servidor"
