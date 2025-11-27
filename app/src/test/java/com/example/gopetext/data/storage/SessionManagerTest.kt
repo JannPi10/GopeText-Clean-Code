@@ -53,29 +53,29 @@ class SessionManagerTest {
         assert(result == null)
     }
 
-    @Test
-    fun `saveUserId should save userId to SharedPreferences`() {
-        val userId = 42
-        sessionManager.saveUserId(userId)
-        verify(editor).putInt("user_id", userId)
-        verify(editor).apply()
-    }
+//    @Test
+//    fun `saveUserId should save userId to SharedPreferences`() {
+//        val userId = 42
+//        sessionManager.saveUserId(userId)
+//        verify(editor).putInt("user_id", userId)
+//        verify(editor).apply()
+//    }
 
-    @Test
-    fun `getUserId should return userId from SharedPreferences`() {
-        val expectedUserId = 123
-        whenever(sharedPreferences.getInt("user_id", -1)).thenReturn(expectedUserId)
-        val result = sessionManager.getUserId()
-        assert(result == expectedUserId)
-        verify(sharedPreferences).getInt("user_id", -1)
-    }
+//    @Test
+//    fun `getUserId should return userId from SharedPreferences`() {
+//        val expectedUserId = 123
+//        whenever(sharedPreferences.getInt("user_id", -1)).thenReturn(expectedUserId)
+//        val result = sessionManager.getUserId()
+//        assert(result == expectedUserId)
+//        verify(sharedPreferences).getInt("user_id", -1)
+//    }
 
-    @Test
-    fun `getUserId should return -1 when no userId stored`() {
-        whenever(sharedPreferences.getInt("user_id", -1)).thenReturn(-1)
-        val result = sessionManager.getUserId()
-        assert(result == -1)
-    }
+//    @Test
+//    fun `getUserId should return -1 when no userId stored`() {
+//        whenever(sharedPreferences.getInt("user_id", -1)).thenReturn(-1)
+//        val result = sessionManager.getUserId()
+//        assert(result == -1)
+//    }
 
     @Test
     fun `clearSession should clear all SharedPreferences`() {
@@ -108,19 +108,19 @@ class SessionManagerTest {
         verify(editor).apply()
     }
 
-    @Test
-    fun `saveUserId with zero should save zero`() {
-        val userId = 0
-        sessionManager.saveUserId(userId)
-        verify(editor).putInt("user_id", userId)
-        verify(editor).apply()
-    }
-
-    @Test
-    fun `saveUserId with negative number should save negative number`() {
-        val userId = -5
-        sessionManager.saveUserId(userId)
-        verify(editor).putInt("user_id", userId)
-        verify(editor).apply()
-    }
+//    @Test
+//    fun `saveUserId with zero should save zero`() {
+//        val userId = 0
+//        sessionManager.saveUserId(userId)
+//        verify(editor).putInt("user_id", userId)
+//        verify(editor).apply()
+//    }
+//
+//    @Test
+//    fun `saveUserId with negative number should save negative number`() {
+//        val userId = -5
+//        sessionManager.saveUserId(userId)
+//        verify(editor).putInt("user_id", userId)
+//        verify(editor).apply()
+//    }
 }

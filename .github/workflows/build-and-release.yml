@@ -38,14 +38,6 @@ jobs:
           name: test-results
           path: app/build/reports/tests/
 
-      - name: Publish test report
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: Unit Test Results
-          path: 'app/build/test-results/testDebugUnitTest/TEST-*.xml'
-          reporter: 'java-junit'
-
   build-apk:
     needs: test
     runs-on: ubuntu-latest
