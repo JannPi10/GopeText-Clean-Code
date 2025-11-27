@@ -1,6 +1,7 @@
 package com.example.gopetext.data.storage
 
 import android.content.Context
+import android.util.Log
 import android.content.SharedPreferences
 
 class SessionManager(context: Context) {
@@ -24,11 +25,17 @@ class SessionManager(context: Context) {
     }
 
     fun saveUserId(userId: Int) {
+        Log.d("SessionManager", "Guardando userId: $userId")
         prefs.edit().putInt(KEY_USER_ID, userId).apply()
+        // Verificar que se guardó correctamente
+        val savedId = prefs.getInt(KEY_USER_ID, -1)
+        Log.d("SessionManager", "userId guardado: $savedId")
     }
 
     fun getUserId(): Int {
-        return prefs.getInt(KEY_USER_ID, -1)
+        val userId = prefs.getInt(KEY_USER_ID, -1)
+        Log.d("SessionManager", "Recuperando userId: $userId")
+        return userId
     }
 
     fun clearSession() {

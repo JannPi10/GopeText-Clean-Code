@@ -7,8 +7,10 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -38,8 +40,16 @@ class ChatSingleActivity : AppCompatActivity(), ChatSingleContract.View {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        Log.d("ChatSingleActivity", "onCreate - Iniciando actividad")
         sessionManager = SessionManager(this)
+        
+        // Obtener el ID del usuario actual
         currentUserId = sessionManager.getUserId()
+        Log.d("ChatSingleActivity", "ID de usuario actual: $currentUserId")
+        
+        // Verificar si el token está disponible
+        val token = sessionManager.getAccessToken()
+        Log.d("ChatSingleActivity", "Token de acceso: ${token?.take(10)}...")
 
         chatId = intent.getIntExtra("chatId", -1)
         isGroup = intent.getBooleanExtra("isGroup", false)
@@ -75,6 +85,7 @@ class ChatSingleActivity : AppCompatActivity(), ChatSingleContract.View {
     }
 
     private fun setupRecycler() {
+        Log.d("ChatSingleActivity", "Configurando Recycler con currentUserId: $currentUserId")
         adapter = ChatAdapter(currentUserId)
         binding.chatRecyclerview.layoutManager = LinearLayoutManager(this)
         binding.chatRecyclerview.adapter = adapter
